@@ -68,7 +68,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'APPRO.wsgi.application'
+WSGI_APPLICATION = 'APPRO.wsgi.application'  
 
 
 # Database
@@ -126,3 +126,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Utilisation du modèle User personnalisé
 AUTH_USER_MODEL = 'CAHMS.User'
 LOGIN_URL = '/login/'
+
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
