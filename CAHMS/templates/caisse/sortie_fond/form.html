@@ -1,0 +1,129 @@
+{% extends 'caisse/base.html' %}
+{% load widget_tweaks %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+            <div class="bg-primary rounded-circle p-3 me-3">
+                <i class="fas fa-arrow-circle-up text-white fs-4"></i>
+            </div>
+            <div>
+                <h1 class="h3 mb-1 text-dark fw-bold">{{ title }}</h1>
+                <p class="text-muted mb-0">Formulaire de gestion des sorties de fond</p>
+            </div>
+        </div>
+        <a href="{% url 'caisse_sortie_fond_list' %}" class="btn btn-outline-primary d-flex align-items-center">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+        </a>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-gradient-primary text-white py-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3">
+                            <i class="fas fa-edit text-white"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-0 fw-bold">Informations de la Sortie de Fond</h5>
+                            <small class="opacity-75">Remplissez tous les champs obligatoires</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" autocomplete="off">
+                        {% csrf_token %}
+                        <div class="row g-4 mb-4">
+                            <div class="col-12 col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                    {{ form.montant|add_class:'form-control'|attr:'placeholder:Montant de la sortie' }}
+                                </div>
+                                <label for="{{ form.montant.id_for_label }}" class="form-label mt-1">Montant *</label>
+                                {% if form.montant.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.montant.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    {{ form.agent|add_class:'form-select' }}
+                                </div>
+                                <label for="{{ form.agent.id_for_label }}" class="form-label mt-1">Agent *</label>
+                                {% if form.agent.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.agent.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-12">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-comment"></i></span>
+                                    {{ form.motif|add_class:'form-control'|attr:'placeholder:Motif de la sortie'|attr:'rows:1'|attr:'style:max-height:38px;' }}
+                                </div>
+                                <label for="{{ form.motif.id_for_label }}" class="form-label mt-1">Motif *</label>
+                                {% if form.motif.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.motif.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                    {{ form.date_sortie|add_class:'form-control'|attr:'type:date' }}
+                                </div>
+                                <label for="{{ form.date_sortie.id_for_label }}" class="form-label mt-1">Date de Sortie *</label>
+                                {% if form.date_sortie.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.date_sortie.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-file-invoice-dollar"></i></span>
+                                    <select name="{{ form.demande.name }}" id="id_demande" class="form-select">
+                                        <option value="">---------</option>
+                                        {% for demande in form.fields.demande.queryset %}
+                                            <option value="{{ demande.id }}" data-montant="{{ demande.montant }}">
+                                                DF{{ demande.id|stringformat:"03d" }} - {{ demande.fournisseur.designation }} - {{ demande.montant }} FC - {{ demande.date_demande|date:"d/m/Y" }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <label for="id_demande" class="form-label mt-1">Demande de Fonds *</label>
+                                {% if form.demande.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.demande.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-3 pt-3 border-top">
+                            <a href="{% url 'caisse_sortie_fond_list' %}" class="btn btn-outline-secondary px-4 py-2">
+                                <i class="fas fa-times me-2"></i>Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 py-2 shadow-sm">
+                                <i class="fas fa-save me-2"></i>Enregistrer la Sortie
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectDemande = document.getElementById('id_demande');
+    const montantInput = document.getElementById('id_montant');
+    if (selectDemande && montantInput) {
+        selectDemande.addEventListener('change', function() {
+            const selected = selectDemande.options[selectDemande.selectedIndex];
+            const montant = selected.getAttribute('data-montant');
+            if (montant) {
+                montantInput.value = montant;
+            } else {
+                montantInput.value = '';
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 

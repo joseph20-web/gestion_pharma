@@ -1,0 +1,199 @@
+{% extends 'agent_facture/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Nouveau Client - Agent Facturation{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- En-tête -->
+    <div class="col-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Nouveau Client
+                </h2>
+                <p class="text-muted mb-0">Ajoutez un nouveau client à votre base de données</p>
+            </div>
+            <div>
+                <a href="{% url 'agent_facture_client_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Retour aux Clients
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-user me-2"></i>
+                    Informations du Client
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post" autocomplete="off" id="client-form">
+                    {% csrf_token %}
+                    
+                    <!-- Informations personnelles -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-user me-1"></i>
+                                Nom *
+                            </label>
+                            {{ form.nom|add_class:'form-control'|attr:'placeholder:Nom du client' }}
+                            {% if form.nom.errors %}
+                                <div class="invalid-feedback d-block">{{ form.nom.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-user me-1"></i>
+                                Postnom *
+                            </label>
+                            {{ form.postnom|add_class:'form-control'|attr:'placeholder:Postnom du client' }}
+                            {% if form.postnom.errors %}
+                                <div class="invalid-feedback d-block">{{ form.postnom.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-user me-1"></i>
+                                Prénom *
+                            </label>
+                            {{ form.prenom|add_class:'form-control'|attr:'placeholder:Prénom du client' }}
+                            {% if form.prenom.errors %}
+                                <div class="invalid-feedback d-block">{{ form.prenom.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-calendar me-1"></i>
+                                Date de naissance *
+                            </label>
+                            {{ form.date_naissance|add_class:'form-control'|attr:'type:date' }}
+                            {% if form.date_naissance.errors %}
+                                <div class="invalid-feedback d-block">{{ form.date_naissance.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-venus-mars me-1"></i>
+                                Sexe *
+                            </label>
+                            {{ form.sexe|add_class:'form-select' }}
+                            {% if form.sexe.errors %}
+                                <div class="invalid-feedback d-block">{{ form.sexe.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Boutons d'action -->
+                    <div class="d-flex justify-content-end gap-3">
+                        <a href="{% url 'agent_facture_client_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="submit-btn">
+                            <i class="fas fa-save me-2"></i>Enregistrer le client
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const submitBtn = document.getElementById('submit-btn');
+    const clientForm = document.getElementById('client-form');
+    
+    // Validation du formulaire avant soumission
+    clientForm.addEventListener('submit', function(e) {
+        // Vérifier les champs obligatoires du modèle Personne
+        const nom = document.querySelector('input[name="nom"]').value.trim();
+        const postnom = document.querySelector('input[name="postnom"]').value.trim();
+        const prenom = document.querySelector('input[name="prenom"]').value.trim();
+        const dateNaissance = document.querySelector('input[name="date_naissance"]').value;
+        const sexe = document.querySelector('select[name="sexe"]').value;
+        
+        let hasErrors = false;
+        
+        // Validation du nom
+        if (!nom) {
+            document.querySelector('input[name="nom"]').classList.add('is-invalid');
+            hasErrors = true;
+        } else {
+            document.querySelector('input[name="nom"]').classList.remove('is-invalid');
+        }
+        
+        // Validation du postnom
+        if (!postnom) {
+            document.querySelector('input[name="postnom"]').classList.add('is-invalid');
+            hasErrors = true;
+        } else {
+            document.querySelector('input[name="postnom"]').classList.remove('is-invalid');
+        }
+        
+        // Validation du prénom
+        if (!prenom) {
+            document.querySelector('input[name="prenom"]').classList.add('is-invalid');
+            hasErrors = true;
+        } else {
+            document.querySelector('input[name="prenom"]').classList.remove('is-invalid');
+        }
+        
+        // Validation de la date de naissance
+        if (!dateNaissance) {
+            document.querySelector('input[name="date_naissance"]').classList.add('is-invalid');
+            hasErrors = true;
+        } else {
+            document.querySelector('input[name="date_naissance"]').classList.remove('is-invalid');
+        }
+        
+        // Validation du sexe
+        if (!sexe) {
+            document.querySelector('select[name="sexe"]').classList.add('is-invalid');
+            hasErrors = true;
+        } else {
+            document.querySelector('select[name="sexe"]').classList.remove('is-invalid');
+        }
+        
+        if (hasErrors) {
+            e.preventDefault();
+            alert('Veuillez remplir tous les champs obligatoires.');
+            return;
+        }
+        
+        // Désactiver le bouton pour éviter la double soumission
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enregistrement...';
+    });
+    
+    // Validation en temps réel
+    document.querySelectorAll('input, select, textarea').forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.hasAttribute('required') && !this.value.trim()) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid') && this.value.trim()) {
+                this.classList.remove('is-invalid');
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 

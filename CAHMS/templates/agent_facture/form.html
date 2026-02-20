@@ -1,0 +1,539 @@
+{% extends 'agent_facture/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Nouvelle Commande - Agent Facturation{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- En-tête -->
+    <div class="col-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="fas fa-{% if edit_mode %}edit{% else %}plus-circle{% endif %} me-2"></i>
+                    {% if edit_mode %}Modifier la Commande #{{ commande.id }}{% else %}Nouvelle Commande{% endif %}
+                </h2>
+                <p class="text-muted mb-0">{% if edit_mode %}Modifiez les détails de la commande{% else %}Créez une nouvelle commande client{% endif %}</p>
+            </div>
+            <div>
+                <a href="{% url 'agent_facture_commande_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Retour aux Commandes
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    Informations de la Commande
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post" autocomplete="off" id="commande-form">
+                    {% csrf_token %}
+                    
+                    <!-- Informations de base -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-user me-1"></i>
+                                Client *
+                            </label>
+                            {{ form.client|add_class:'form-select' }}
+                            {% if form.client.errors %}
+                                <div class="invalid-feedback d-block">{{ form.client.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-calendar me-1"></i>
+                                Date de commande *
+                            </label>
+                            {{ form.date_commande|add_class:'form-control'|attr:'type:date' }}
+                            {% if form.date_commande.errors %}
+                                <div class="invalid-feedback d-block">{{ form.date_commande.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Section des produits -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0 text-success">
+                                <i class="fas fa-pills me-2"></i>
+                                Produits commandés
+                            </h6>
+                            <button type="button" class="btn btn-sm btn-outline-success" id="add-produit-btn">
+                                <i class="fas fa-plus me-1"></i>
+                                Ajouter un produit
+                            </button>
+                        </div>
+
+                        <!-- Affichage des erreurs du formset -->
+                        {% if formset.non_form_errors %}
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                {% for error in formset.non_form_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Conteneur des produits -->
+                        <div id="produits-container">
+                            {{ formset.management_form }}
+                            {% for form in formset %}
+                                <div class="produit-ligne mb-3 p-3 border rounded bg-light">
+                                    <div class="row g-3 align-items-end">
+                                        <div class="col-md-4">
+                                            <label class="form-label">
+                                                <i class="fas fa-pills me-1"></i>
+                                                Produit *
+                                            </label>
+                                            {{ form.produit|add_class:'form-select produit-select' }}
+                                            {% if form.produit.errors %}
+                                                <div class="invalid-feedback d-block">{{ form.produit.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">
+                                                <i class="fas fa-hashtag me-1"></i>
+                                                Quantité *
+                                            </label>
+                                            {{ form.quantite|add_class:'form-control quantite-input'|attr:'min:1'|attr:'value:1' }}
+                                            {% if form.quantite.errors %}
+                                                <div class="invalid-feedback d-block">{{ form.quantite.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">
+                                                <i class="fas fa-boxes me-1"></i>
+                                                Stock disponible
+                                            </label>
+                                            <input type="number" class="form-control stock-disponible" readonly>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">
+                                                <i class="fas fa-tag me-1"></i>
+                                                Prix unitaire
+                                            </label>
+                                            <input type="number" class="form-control prix-unitaire" readonly>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">
+                                                <i class="fas fa-calculator me-1"></i>
+                                                Total
+                                            </label>
+                                            <input type="number" class="form-control total-ligne" readonly>
+                                        </div>
+                                        <div class="col-md-12 d-flex justify-content-end">
+                                            {% if formset.can_delete %}
+                                                <div class="form-check">
+                                                    {{ form.DELETE|add_class:'form-check-input' }}
+                                                    <label class="form-check-label text-danger">
+                                                        <i class="fas fa-trash me-1"></i>Supprimer ce produit
+                                                    </label>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% for hidden in form.hidden_fields %}
+                                        {{ hidden }}
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Total général -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 offset-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0 fw-bold">
+                                            <i class="fas fa-calculator me-2"></i>
+                                            Total de la commande :
+                                        </h5>
+                                        <h4 class="mb-0 text-primary" id="total-commande">0.00 FC</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Boutons d'action -->
+                    <div class="d-flex justify-content-end gap-3">
+                        <a href="{% url 'agent_facture_commande_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="submit-btn">
+                            <i class="fas fa-save me-2"></i>{% if edit_mode %}Modifier la commande{% else %}Enregistrer la commande{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Données des produits
+const produitsData = {{ produits_data|safe }};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const produitsContainer = document.getElementById('produits-container');
+    const addProduitBtn = document.getElementById('add-produit-btn');
+    const totalCommande = document.getElementById('total-commande');
+    const submitBtn = document.getElementById('submit-btn');
+    
+    console.log('Données des produits:', produitsData);
+    
+    // Fonction pour créer les options de produits
+    function createProduitOptions() {
+        let options = '<option value="">Sélectionnez un produit</option>';
+        for (const [id, produit] of Object.entries(produitsData)) {
+            options += `<option value="${id}" data-prix="${produit.prix}" data-stock="${produit.stock}">${produit.nom} (Stock: ${produit.stock})</option>`;
+        }
+        return options;
+    }
+    
+    // Fonction pour mettre à jour le prix unitaire et vérifier le stock
+    function updatePrixUnitaire(selectElement) {
+        const ligne = selectElement.closest('.produit-ligne');
+        if (!ligne) return;
+        
+        const produitId = selectElement.value;
+        const prixInput = ligne.querySelector('.prix-unitaire');
+        const stockInput = ligne.querySelector('.stock-disponible');
+        const quantiteInput = ligne.querySelector('.quantite-input');
+        const totalInput = ligne.querySelector('.total-ligne');
+        
+        console.log('updatePrixUnitaire appelé avec produitId:', produitId);
+        
+        if (produitId && produitsData[produitId]) {
+            const produit = produitsData[produitId];
+            const prix = produit.prix;
+            const stock = produit.stock || 0;
+            
+            prixInput.value = prix.toFixed(2);
+            stockInput.value = stock;
+            
+            // Calculer le total de la ligne
+            const quantite = parseFloat(quantiteInput.value) || 0;
+            const total = prix * quantite;
+            totalInput.value = total.toFixed(2);
+            
+            // Vérifier le stock
+            if (quantite > stock) {
+                quantiteInput.classList.add('is-invalid');
+                quantiteInput.setCustomValidity(`Stock insuffisant. Disponible: ${stock}`);
+                console.log('Stock insuffisant détecté:', quantite, '>', stock);
+            } else {
+                quantiteInput.classList.remove('is-invalid');
+                quantiteInput.setCustomValidity('');
+            }
+        } else {
+            prixInput.value = '';
+            stockInput.value = '';
+            totalInput.value = '';
+        }
+        
+        calculerTotalCommande();
+    }
+    
+    // Fonction pour calculer le total de la commande
+    function calculerTotalCommande() {
+        let total = 0;
+        document.querySelectorAll('.produit-ligne').forEach(ligne => {
+            const deleteCheckbox = ligne.querySelector('input[name*="-DELETE"]');
+            if (!deleteCheckbox || !deleteCheckbox.checked) {
+                const totalLigne = parseFloat(ligne.querySelector('.total-ligne').value) || 0;
+                total += totalLigne;
+            }
+        });
+        
+        totalCommande.textContent = total.toFixed(2) + ' FC';
+    }
+    
+    // Fonction pour mettre à jour les indices des formulaires
+    function updateFormIndices() {
+        const lignes = document.querySelectorAll('.produit-ligne');
+        lignes.forEach((ligne, index) => {
+            // Mettre à jour les noms des champs
+            const produitSelect = ligne.querySelector('select[name*="-produit"]');
+            const quantiteInput = ligne.querySelector('input[name*="-quantite"]');
+            const deleteCheckbox = ligne.querySelector('input[name*="-DELETE"]');
+            const idInput = ligne.querySelector('input[name*="-id"]');
+            
+            if (produitSelect) produitSelect.name = `produits-${index}-produit`;
+            if (quantiteInput) quantiteInput.name = `produits-${index}-quantite`;
+            if (deleteCheckbox) deleteCheckbox.name = `produits-${index}-DELETE`;
+            if (idInput) idInput.name = `produits-${index}-id`;
+        });
+        
+        // Mettre à jour TOTAL_FORMS
+        const totalFormsInput = document.querySelector('input[name="produits-TOTAL_FORMS"]');
+        if (totalFormsInput) {
+            totalFormsInput.value = lignes.length;
+        }
+    }
+    
+    // Fonction pour ajouter un nouveau produit
+    function ajouterProduit() {
+        const formNum = document.querySelectorAll('.produit-ligne').length;
+        
+        // Mettre à jour TOTAL_FORMS dans le management form
+        const totalFormsInput = document.querySelector('input[name="produits-TOTAL_FORMS"]');
+        if (totalFormsInput) {
+            totalFormsInput.value = formNum + 1;
+        }
+        
+        const newLigne = document.createElement('div');
+        newLigne.className = 'produit-ligne mb-3 p-3 border rounded bg-light';
+        newLigne.innerHTML = `
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">
+                        <i class="fas fa-pills me-1"></i>
+                        Produit *
+                    </label>
+                    <select name="produits-${formNum}-produit" class="form-select produit-select" required>
+                        ${createProduitOptions()}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">
+                        <i class="fas fa-hashtag me-1"></i>
+                        Quantité *
+                    </label>
+                    <input type="number" name="produits-${formNum}-quantite" class="form-control quantite-input" min="1" value="1" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">
+                        <i class="fas fa-boxes me-1"></i>
+                        Stock disponible
+                    </label>
+                    <input type="number" class="form-control stock-disponible" readonly>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">
+                        <i class="fas fa-tag me-1"></i>
+                        Prix unitaire
+                    </label>
+                    <input type="number" class="form-control prix-unitaire" readonly>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">
+                        <i class="fas fa-calculator me-1"></i>
+                        Total
+                    </label>
+                    <input type="number" class="form-control total-ligne" readonly>
+                </div>
+                <div class="col-md-12 d-flex justify-content-end">
+                    <div class="form-check">
+                        <input type="checkbox" name="produits-${formNum}-DELETE" class="form-check-input">
+                        <label class="form-check-label text-danger">
+                            <i class="fas fa-trash me-1"></i>Supprimer ce produit
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="produits-${formNum}-id" value="">
+        `;
+        
+        produitsContainer.appendChild(newLigne);
+        
+        // Ajouter les événements pour la nouvelle ligne
+        const newSelect = newLigne.querySelector('.produit-select');
+        const newQuantite = newLigne.querySelector('.quantite-input');
+        const newDelete = newLigne.querySelector('input[name*="-DELETE"]');
+        
+        if (newSelect) {
+            newSelect.addEventListener('change', function() {
+                updatePrixUnitaire(this);
+            });
+        }
+        
+        if (newQuantite) {
+            newQuantite.addEventListener('input', function() {
+                const ligne = this.closest('.produit-ligne');
+                const prix = parseFloat(ligne.querySelector('.prix-unitaire').value) || 0;
+                const stock = parseInt(ligne.querySelector('.stock-disponible').value) || 0;
+                const quantite = parseFloat(this.value) || 0;
+                const total = prix * quantite;
+                
+                ligne.querySelector('.total-ligne').value = total.toFixed(2);
+                
+                // Vérifier le stock
+                if (quantite > stock) {
+                    this.classList.add('is-invalid');
+                    this.setCustomValidity(`Stock insuffisant. Disponible: ${stock}`);
+                } else {
+                    this.classList.remove('is-invalid');
+                    this.setCustomValidity('');
+                }
+                
+                calculerTotalCommande();
+            });
+        }
+        
+        if (newDelete) {
+            newDelete.addEventListener('change', function() {
+                if (this.checked) {
+                    newLigne.style.display = 'none';
+                } else {
+                    newLigne.style.display = 'block';
+                }
+                calculerTotalCommande();
+            });
+        }
+        
+        // Mettre à jour les indices des formulaires après ajout
+        updateFormIndices();
+    }
+    
+    // Initialiser le premier formulaire vide avec les options de produits
+    function initialiserPremierFormulaire() {
+        const premierSelect = document.querySelector('.produit-select');
+        if (premierSelect) {
+            premierSelect.innerHTML = createProduitOptions();
+        }
+    }
+    
+    // Événement pour le bouton d'ajout
+    if (addProduitBtn) {
+        addProduitBtn.addEventListener('click', ajouterProduit);
+    }
+    
+    // Ajouter les événements pour les lignes existantes
+    document.querySelectorAll('.produit-select').forEach(select => {
+        select.addEventListener('change', function() {
+            updatePrixUnitaire(this);
+        });
+    });
+    
+    document.querySelectorAll('.quantite-input').forEach(input => {
+        input.addEventListener('input', function() {
+            const ligne = this.closest('.produit-ligne');
+            const prix = parseFloat(ligne.querySelector('.prix-unitaire').value) || 0;
+            const stock = parseInt(ligne.querySelector('.stock-disponible').value) || 0;
+            const quantite = parseFloat(this.value) || 0;
+            const total = prix * quantite;
+            
+            ligne.querySelector('.total-ligne').value = total.toFixed(2);
+            
+            // Vérifier le stock
+            if (quantite > stock) {
+                this.classList.add('is-invalid');
+                this.setCustomValidity(`Stock insuffisant. Disponible: ${stock}`);
+            } else {
+                this.classList.remove('is-invalid');
+                this.setCustomValidity('');
+            }
+            
+            calculerTotalCommande();
+        });
+    });
+    
+    document.querySelectorAll('input[name*="-DELETE"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const ligne = this.closest('.produit-ligne');
+            if (this.checked) {
+                ligne.style.display = 'none';
+            } else {
+                ligne.style.display = 'block';
+            }
+            calculerTotalCommande();
+            updateFormIndices();
+        });
+    });
+    
+    // Validation du formulaire avant soumission
+    document.getElementById('commande-form').addEventListener('submit', function(e) {
+        let hasErrors = false;
+        
+        // Mettre à jour les indices des formulaires avant soumission
+        updateFormIndices();
+        
+        // Vérifier qu'au moins un produit est sélectionné
+        const produitsSelectionnes = document.querySelectorAll('.produit-select').length;
+        const produitsVides = document.querySelectorAll('.produit-select:not([value=""])').length;
+        
+        if (produitsVides === 0) {
+            alert('Veuillez sélectionner au moins un produit.');
+            e.preventDefault();
+            return;
+        }
+        
+        // Vérifier les stocks
+        document.querySelectorAll('.quantite-input').forEach(input => {
+            const ligne = input.closest('.produit-ligne');
+            const deleteCheckbox = ligne.querySelector('input[name*="-DELETE"]');
+            
+            if (!deleteCheckbox || !deleteCheckbox.checked) {
+                const stock = parseInt(ligne.querySelector('.stock-disponible').value) || 0;
+                const quantite = parseFloat(input.value) || 0;
+                
+                if (quantite > stock) {
+                    hasErrors = true;
+                    input.classList.add('is-invalid');
+                }
+            }
+        });
+        
+        if (hasErrors) {
+            e.preventDefault();
+            alert('Veuillez corriger les erreurs de stock avant de soumettre.');
+            return;
+        }
+        
+        // Désactiver le bouton pour éviter la double soumission
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enregistrement...';
+    });
+    
+    // Initialiser le premier formulaire vide
+    initialiserPremierFormulaire();
+    
+    // Initialiser les prix pour les produits déjà sélectionnés
+    document.querySelectorAll('.produit-select').forEach(select => {
+        if (select.value) {
+            updatePrixUnitaire(select);
+        }
+    });
+    
+    // En mode édition, initialiser tous les champs avec les valeurs existantes
+    {% if edit_mode %}
+    document.querySelectorAll('.produit-ligne').forEach((ligne, index) => {
+        const produitSelect = ligne.querySelector('.produit-select');
+        const quantiteInput = ligne.querySelector('.quantite-input');
+        
+        if (produitSelect && produitSelect.value) {
+            updatePrixUnitaire(produitSelect);
+        }
+        
+        if (quantiteInput && quantiteInput.value) {
+            const prix = parseFloat(ligne.querySelector('.prix-unitaire').value) || 0;
+            const quantite = parseFloat(quantiteInput.value) || 0;
+            const total = prix * quantite;
+            
+            ligne.querySelector('.total-ligne').value = total.toFixed(2);
+        }
+    });
+    {% endif %}
+    
+    // Calculer le total initial
+    calculerTotalCommande();
+});
+</script>
+{% endblock %} 

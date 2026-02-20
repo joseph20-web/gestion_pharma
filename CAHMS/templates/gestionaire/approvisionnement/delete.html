@@ -1,0 +1,137 @@
+{% extends 'gestionaire/base.html' %}
+
+{% block title %}Supprimer l'Approvisionnement - Gestionnaire{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2"><i class="fas fa-trash me-2"></i>Supprimer l'Approvisionnement</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{% url 'approvisionnement_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+            </a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger shadow">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirmation de suppression
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-warning me-2"></i>Attention !</h6>
+                        <p class="mb-0">Cette action est irréversible. Êtes-vous sûr de vouloir supprimer cet approvisionnement ?</p>
+                    </div>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Détails de l'approvisionnement à supprimer
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>N° Approvisionnement :</strong> 
+                                        <span class="badge bg-primary">#{{ approvisionnement.id }}</span>
+                                    </p>
+                                    <p><strong>Date :</strong> 
+                                        <i class="fas fa-calendar me-1"></i>
+                                        {{ approvisionnement.date_approvisionnement|date:"d/m/Y" }}
+                                    </p>
+                                    <p><strong>Sortie de fonds :</strong> 
+                                        <span class="badge bg-info">SF{{ approvisionnement.sortie_fond.id }}</span>
+                                        <br>
+                                        <small class="text-muted">{{ approvisionnement.sortie_fond.montant }} FC</small>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Agent :</strong> 
+                                        <i class="fas fa-user me-1"></i>
+                                        {{ approvisionnement.agent.personne.prenom }} {{ approvisionnement.agent.personne.nom }}
+                                        <br>
+                                        <small class="text-muted">{{ approvisionnement.agent.fonction.designation }}</small>
+                                    </p>
+                                    <p><strong>Observation :</strong> 
+                                        {% if approvisionnement.observation %}
+                                            {{ approvisionnement.observation }}
+                                        {% else %}
+                                            <span class="text-muted">Aucune observation</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Liste des produits -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-pills me-2"></i>Produits de cet approvisionnement
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            {% with approvisionnement.approvisionner_set.all as produits %}
+                                {% if produits %}
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Produit</th>
+                                                    <th>Dosage</th>
+                                                    <th>Quantité</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for prod in produits %}
+                                                <tr>
+                                                    <td>
+                                                        <strong>{{ prod.produit.nom_produit }}</strong>
+                                                        <br>
+                                                        <small class="text-muted">{{ prod.produit.get_forme_display }}</small>
+                                                    </td>
+                                                    <td>{{ prod.produit.dosage }} {{ prod.produit.unite }}</td>
+                                                    <td>
+                                                        <span class="badge bg-success">{{ prod.quantite }}</span>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <p class="text-muted mb-0">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        {{ produits.count }} produit{{ produits.count|pluralize }} seront supprimé{{ produits.count|pluralize }}
+                                    </p>
+                                {% else %}
+                                    <p class="text-muted mb-0">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Aucun produit associé à cet approvisionnement
+                                    </p>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'approvisionnement_list' %}" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-times me-2"></i>Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Confirmer la suppression
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

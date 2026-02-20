@@ -1,0 +1,275 @@
+{% extends 'agent_facture/base.html' %}
+
+{% block title %}Liste des Commandes - Agent Facturation{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- En-tête -->
+    <div class="col-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    Commandes
+                </h2>
+                <p class="text-muted mb-0">Gérez toutes les commandes clients</p>
+            </div>
+            <div>
+                <a href="{% url 'agent_facture_commande_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>
+                    Nouvelle Commande
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtres et recherche -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Rechercher</label>
+                        <input type="text" name="search" class="form-control" placeholder="Client, produit..." value="{{ request.GET.search }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Date de début</label>
+                        <input type="date" name="date_debut" class="form-control" value="{{ request.GET.date_debut }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Date de fin</label>
+                        <input type="date" name="date_fin" class="form-control" value="{{ request.GET.date_fin }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Statut</label>
+                        <select name="statut" class="form-select">
+                            <option value="">Tous</option>
+                            <option value="recente" {% if request.GET.statut == 'recente' %}selected{% endif %}>Récentes</option>
+                            <option value="ancienne" {% if request.GET.statut == 'ancienne' %}selected{% endif %}>Anciennes</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-search me-2"></i>Filtrer
+                        </button>
+                        <a href="{% url 'agent_facture_commande_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Réinitialiser
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques rapides -->
+    <div class="col-12 mb-4">
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <div class="stats-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">{{ total_commandes|default:"0" }}</h4>
+                            <p class="mb-0 opacity-75">Total</p>
+                        </div>
+                        <div class="text-end">
+                            <i class="fas fa-shopping-cart fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="stats-card success">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">{{ commandes_aujourd_hui|default:"0" }}</h4>
+                            <p class="mb-0 opacity-75">Aujourd'hui</p>
+                        </div>
+                        <div class="text-end">
+                            <i class="fas fa-calendar-day fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="stats-card warning">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">{{ total_montant|default:"0"|floatformat:0 }}</h4>
+                            <p class="mb-0 opacity-75">Montant Total (FC)</p>
+                        </div>
+                        <div class="text-end">
+                            <i class="fas fa-money-bill-wave fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="stats-card danger">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">{{ commandes_ce_mois|default:"0" }}</h4>
+                            <p class="mb-0 opacity-75">Ce mois</p>
+                        </div>
+                        <div class="text-end">
+                            <i class="fas fa-calendar-alt fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des commandes -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    Liste des Commandes
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if commandes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>N° Commande</th>
+                                    <th>Client</th>
+                                    <th>Date</th>
+                                    <th>Produits</th>
+                                    <th>Total</th>
+                                    <th>Agent</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for commande in commandes %}
+                                <tr>
+                                    <td>
+                                        <strong>#{{ commande.id }}</strong>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ commande.client.personne.nom }} {{ commande.client.personne.prenom }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ commande.client.personne.telephone }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ commande.date_commande|date:"d/m/Y" }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ commande.date_commande|time:"H:i" }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% for contenir in commande.contenir_set.all|slice:":2" %}
+                                            <span class="badge bg-light text-dark me-1">
+                                                {{ contenir.produit.nom_produit }} ({{ contenir.quantite }})
+                                            </span>
+                                        {% endfor %}
+                                        {% if commande.contenir_set.count > 2 %}
+                                            <span class="badge bg-secondary">+{{ commande.contenir_set.count|add:"-2" }} autres</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary fs-6">{{ commande.prix_total|floatformat:0 }} FC</span>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ commande.agent.personne.nom }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'agent_facture_commande_detail' commande.id %}" 
+                                               class="btn btn-sm btn-outline-primary" 
+                                               title="Voir détails">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'agent_facture_commande_edit' commande.id %}" 
+                                               class="btn btn-sm btn-outline-warning" 
+                                               title="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'agent_facture_commande_print' commande.id %}" 
+                                               class="btn btn-sm btn-outline-success" 
+                                               title="Imprimer">
+                                                <i class="fas fa-print"></i>
+                                            </a>
+                                            <a href="{% url 'agent_facture_commande_delete' commande.id %}" 
+                                               class="btn btn-sm btn-outline-danger" 
+                                               title="Supprimer"
+                                               onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette commande ? Cette action est irréversible.')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if commandes.has_other_pages %}
+                    <nav aria-label="Pagination des commandes" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if commandes.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.date_debut %}&date_debut={{ request.GET.date_debut }}{% endif %}{% if request.GET.date_fin %}&date_fin={{ request.GET.date_fin }}{% endif %}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ commandes.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.date_debut %}&date_debut={{ request.GET.date_debut }}{% endif %}{% if request.GET.date_fin %}&date_fin={{ request.GET.date_fin }}{% endif %}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}">
+                                        <i class="fas fa-angle-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in commandes.paginator.page_range %}
+                                {% if commandes.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > commandes.number|add:'-3' and num < commandes.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.date_debut %}&date_debut={{ request.GET.date_debut }}{% endif %}{% if request.GET.date_fin %}&date_fin={{ request.GET.date_fin }}{% endif %}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if commandes.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ commandes.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.date_debut %}&date_debut={{ request.GET.date_debut }}{% endif %}{% if request.GET.date_fin %}&date_fin={{ request.GET.date_fin }}{% endif %}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}">
+                                        <i class="fas fa-angle-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ commandes.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.date_debut %}&date_debut={{ request.GET.date_debut }}{% endif %}{% if request.GET.date_fin %}&date_fin={{ request.GET.date_fin }}{% endif %}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-shopping-cart fa-4x text-muted mb-4"></i>
+                        <h4 class="text-muted mb-3">Aucune commande trouvée</h4>
+                        <p class="text-muted mb-4">Commencez par créer votre première commande</p>
+                        <a href="{% url 'agent_facture_commande_create' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus me-2"></i>
+                            Créer une Commande
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

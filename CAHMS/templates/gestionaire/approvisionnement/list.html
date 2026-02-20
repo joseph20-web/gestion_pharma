@@ -1,0 +1,143 @@
+{% extends 'gestionaire/base.html' %}
+
+{% block title %}Liste des Approvisionnements{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2"><i class="fas fa-truck me-2"></i>Liste des approvisionnements</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{% url 'approvisionnement_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Nouvel Approvisionnement
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            {% if approvisionnements %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>N°</th>
+                                <th>Date</th>
+                                <th>Sortie de fonds</th>
+                                <th>Agent</th>
+                                <th>Produits</th>
+                                <th>Observation</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appro in approvisionnements %}
+                            <tr>
+                                <td><span class="badge bg-primary">#{{ appro.id }}</span></td>
+                                <td>
+                                    <i class="fas fa-calendar me-1"></i>
+                                    {{ appro.date_approvisionnement|date:"d/m/Y" }}
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        SF{{ appro.sortie_fond.id }}
+                                    </span>
+                                    <br>
+                                    <small class="text-muted">{{ appro.sortie_fond.montant }} FC</small>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-user me-2 text-primary"></i>
+                                        <div>
+                                            <strong>{{ appro.agent.personne.prenom }} {{ appro.agent.personne.nom }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ appro.agent.fonction.designation }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% with appro.approvisionner_set.all as produits %}
+                                        <span class="badge bg-success">{{ produits.count }} produit{{ produits.count|pluralize }}</span>
+                                        <br>
+                                        <small class="text-muted">
+                                            {% for prod in produits|slice:":2" %}
+                                                {{ prod.produit.nom_produit }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                            {% if produits.count > 2 %}...{% endif %}
+                                        </small>
+                                    {% endwith %}
+                                </td>
+                                <td>
+                                    {% if appro.observation %}
+                                        <span class="text-truncate d-inline-block" style="max-width: 150px;" title="{{ appro.observation }}">
+                                            {{ appro.observation|truncatechars:30 }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">Aucune observation</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'approvisionnement_update' appro.id %}" class="btn btn-sm btn-outline-primary" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'approvisionnement_delete' appro.id %}" class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                        <a href="{% url 'approvisionnement_print' appro.id %}" class="btn btn-sm btn-outline-secondary" title="Imprimer" target="_blank">
+                                            <i class="fas fa-print"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Statistiques -->
+                <div class="row mt-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="card-title">Total</h6>
+                                        <h4>{{ approvisionnements.count }}</h4>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-truck fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="card-title">Ce mois</h6>
+                                        <h4>{{ approvisionnements.count }}</h4>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-calendar fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-truck fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Aucun approvisionnement enregistré</h4>
+                    <p class="text-muted">Commencez par créer votre premier approvisionnement.</p>
+                    <a href="{% url 'approvisionnement_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Créer un Approvisionnement
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

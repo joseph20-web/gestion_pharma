@@ -1,0 +1,70 @@
+{% extends 'caisse/base.html' %}
+
+{% block title %}Liste des Fournisseurs{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'caisse_dashboard' %}">
+                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-truck me-1"></i>Fournisseurs
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Titre de la page -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-truck me-2"></i>
+                Liste des Fournisseurs
+            </h1>
+            <p class="text-muted">Consultation de la base de données des fournisseurs</p>
+        </div>
+    </div>
+
+    <!-- Carte principale -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-list me-2"></i>
+                Base Fournisseurs ({{ fournisseurs.count }} fournisseur{{ fournisseurs.count|pluralize }})
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if fournisseurs %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Code Fournisseur</th>
+                                <th>Désignation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fournisseur in fournisseurs %}
+                            <tr>
+                                <td>{{ fournisseur.id }}</td>
+                                <td>{{ fournisseur.designation }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-truck fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Aucun fournisseur trouvé</h5>
+                    <p class="text-muted">Les fournisseurs apparaîtront ici une fois ajoutés par les gestionnaires.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,61 @@
+{% extends 'base_modern.html' %}
+{% load static %}
+
+{% block title %}Gestionnaire - CAHMS{% endblock %}
+
+{% block brand_url %}{% url 'dashboard' %}{% endblock %}
+{% block brand_name %}Gestionnaire de Stock{% endblock %}
+{% block user_name %}Gestionnaire{% endblock %}
+
+{% block sidebar_items %}
+<li class="sidebar-nav-item">
+    <a href="{% url 'dashboard' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+        <i class="sidebar-nav-icon fas fa-tachometer-alt"></i> Dashboard
+    </a>
+</li>
+<li class="sidebar-nav-item">
+    <a href="{% url 'demande_fond_list' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'demande_fond_list' %}active{% endif %}">
+        <i class="sidebar-nav-icon fas fa-file-invoice"></i> Demandes de fonds
+    </a>
+</li>
+<li class="sidebar-nav-item">
+    <a href="{% url 'approvisionnement_list' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'approvisionnement_list' %}active{% endif %}">
+        <i class="sidebar-nav-icon fas fa-truck"></i> Réceptions
+    </a>
+</li>
+<li class="sidebar-nav-item">
+    <a href="{% url 'perte_list' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'perte_list' %}active{% endif %}">
+        <i class="sidebar-nav-icon fas fa-exclamation-triangle"></i> Pertes
+    </a>
+</li>
+<li class="sidebar-nav-item">
+    <a href="{% url 'fournisseur_list' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'fournisseur_list' %}active{% endif %}">
+        <i class="sidebar-nav-icon fas fa-building"></i> Fournisseurs
+    </a>
+</li>
+<li class="sidebar-nav-item">
+    <a href="{% url 'produit_list' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'produit_list' %}active{% endif %}">
+        <i class="sidebar-nav-icon fas fa-pills"></i> Produits
+    </a>
+</li>
+<li class="sidebar-nav-item">
+    <a href="{% url 'stock_list' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'stock_list' %}active{% endif %}">
+        <i class="sidebar-nav-icon fas fa-warehouse"></i> Stock
+    </a>
+</li>
+<li class="sidebar-nav-item">
+    <a href="{% url 'rapport_index' %}" class="sidebar-nav-link {% if 'rapport' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="sidebar-nav-icon fas fa-chart-bar"></i> Rapports
+    </a>
+</li>
+<li class="sidebar-nav-item">
+    <a href="{% url 'gestionnaire_agent_list' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'gestionnaire_agent_list' %}active{% endif %}">
+        <i class="sidebar-nav-icon fas fa-users"></i> Agents
+    </a>
+</li>
+<li class="sidebar-nav-item">
+    <a href="{% url 'profile_utilisateur' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'profile_utilisateur' %}active{% endif %}">
+        <i class="sidebar-nav-icon fas fa-user"></i> Mon profil
+    </a>
+</li>
+{% endblock %} 

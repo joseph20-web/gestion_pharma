@@ -1,0 +1,65 @@
+{% extends 'caisse/base.html' %}
+
+{% block title %}Supprimer le Paiement - Caisse{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'caisse_dashboard' %}"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'caisse_paiement_list' %}"><i class="fas fa-money-bill-wave me-1"></i>Paiements</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-trash me-1"></i>Supprimer le Paiement
+            </li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirmation de suppression
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-warning me-2"></i>Attention !</h6>
+                        <p class="mb-0">Cette action est irréversible. Êtes-vous sûr de vouloir supprimer ce paiement ?</p>
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">Détails du paiement à supprimer :</h6>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p><strong>N° Paiement :</strong> {{ paiement.id }}</p>
+                                    <p><strong>Montant :</strong> {{ paiement.montant }}</p>
+                                    <p><strong>Commande :</strong> {{ paiement.commande.id }}</p>
+                                    <p><strong>Agent :</strong> {{ paiement.agent.personne.nom }} {{ paiement.agent.personne.postnom }}</p>
+                                    <p><strong>Date Paiement :</strong> {{ paiement.date_paiement|date:"d/m/Y" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'caisse_paiement_list' %}" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-times me-2"></i>Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Confirmer la suppression
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

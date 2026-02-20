@@ -1,0 +1,283 @@
+{% extends 'gestionaire/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+            <div class="bg-primary rounded-circle p-3 me-3">
+                <i class="fas fa-file-invoice text-white fs-4"></i>
+            </div>
+            <div>
+                <h1 class="h3 mb-1 text-dark fw-bold">{{ title }}</h1>
+                <p class="text-muted mb-0">Formulaire de demande de fonds</p>
+            </div>
+        </div>
+        <a href="{% url 'demande_fond_list' %}" class="btn btn-outline-primary d-flex align-items-center">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-9">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-gradient-primary text-white py-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3">
+                            <i class="fas fa-edit text-white"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-0 fw-bold">Informations de la Demande de Fonds</h5>
+                            <small class="opacity-75">Remplissez tous les champs obligatoires</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" autocomplete="off" id="demande-fond-form">
+                        {% csrf_token %}
+                        
+                        <!-- Informations principales -->
+                        <div class="row g-4 mb-4">
+                            <div class="col-12 col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-building"></i></span>
+                                    {{ form.fournisseur|add_class:'form-select' }}
+                                </div>
+                                <label for="{{ form.fournisseur.id_for_label }}" class="form-label mt-1">Fournisseur *</label>
+                                {% if form.fournisseur.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.fournisseur.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                    {{ form.date_demande|add_class:'form-control'|attr:'type:date' }}
+                                </div>
+                                <label for="{{ form.date_demande.id_for_label }}" class="form-label mt-1">Date de Demande *</label>
+                                {% if form.date_demande.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.date_demande.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-12">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-comment"></i></span>
+                                    {{ form.motif|add_class:'form-control'|attr:'placeholder:Détails de la demande...'|attr:'rows:4' }}
+                                </div>
+                                <label for="{{ form.motif.id_for_label }}" class="form-label mt-1">Motif *</label>
+                                {% if form.motif.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.motif.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                    {{ form.montant|add_class:'form-control'|attr:'readonly:readonly'|attr:'placeholder:Calculé automatiquement' }}
+                                </div>
+                                <label for="{{ form.montant.id_for_label }}" class="form-label mt-1">Montant Total (Calculé automatiquement)</label>
+                                {% if form.montant.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.montant.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Section des produits -->
+                        <div class="border-top pt-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="mb-0"><i class="fas fa-pills me-2"></i>Produits de la demande</h6>
+                                <button type="button" class="btn btn-sm btn-outline-primary" id="add-produit">
+                                    <i class="fas fa-plus me-1"></i>Ajouter un produit
+                                </button>
+                            </div>
+                            
+                            <!-- Affichage des erreurs du formset -->
+                            {% if formset.non_form_errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in formset.non_form_errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            <div id="produits-container">
+                                {{ formset.management_form }}
+                                {% for form in formset %}
+                                    <div class="produit-form mb-3 p-3 border rounded bg-light">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Produit *</label>
+                                                {{ form.produit|add_class:'form-select select-produit' }}
+                                                {% if form.produit.errors %}
+                                                    <div class="invalid-feedback d-block">{{ form.produit.errors.0 }}</div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Quantité *</label>
+                                                {{ form.quantite|add_class:'form-control quantite-input'|attr:'min:1'|attr:'value:1' }}
+                                                {% if form.quantite.errors %}
+                                                    <div class="invalid-feedback d-block">{{ form.quantite.errors.0 }}</div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="col-md-2 d-flex align-items-end">
+                                                {% if formset.can_delete %}
+                                                    <div class="form-check">
+                                                        {{ form.DELETE|add_class:'form-check-input' }}
+                                                        <label class="form-check-label" for="{{ form.DELETE.id_for_label }}">
+                                                            Supprimer
+                                                        </label>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        {% for hidden in form.hidden_fields %}
+                                            {{ hidden }}
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-3 pt-4 border-top">
+                            <a href="{% url 'demande_fond_list' %}" class="btn btn-outline-secondary px-4 py-2">
+                                <i class="fas fa-times me-2"></i>Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 py-2 shadow-sm">
+                                <i class="fas fa-save me-2"></i>Enregistrer la Demande
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Données des produits disponibles
+const produitsData = {
+    {% for produit in produits %}
+        {{ produit.id }}: {
+            id: {{ produit.id }},
+            nom: "{{ produit.nom_produit }}",
+            dosage: "{{ produit.dosage }}",
+            unite: "{{ produit.unite }}",
+            forme: "{{ produit.get_forme_display }}",
+            prix: {{ produit.prix_unitaire }}
+        }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const produitsContainer = document.getElementById('produits-container');
+    const addProduitBtn = document.getElementById('add-produit');
+    const totalForms = document.getElementById('id_produits-TOTAL_FORMS');
+    const maxForms = document.getElementById('id_produits-MAX_NUM_FORMS');
+    const minForms = document.getElementById('id_produits-MIN_NUM_FORMS');
+    const montantInput = document.getElementById('id_montant');
+    
+    // Fonction pour calculer le montant total
+    function calculerMontantTotal() {
+        let total = 0;
+        const produitForms = document.querySelectorAll('.produit-form');
+        
+        produitForms.forEach(form => {
+            const produitSelect = form.querySelector('.select-produit');
+            const quantiteInput = form.querySelector('.quantite-input');
+            const deleteCheckbox = form.querySelector('input[name*="-DELETE"]');
+            
+            if (produitSelect && quantiteInput && !deleteCheckbox?.checked) {
+                const selectedOption = produitSelect.options[produitSelect.selectedIndex];
+                if (selectedOption && selectedOption.value) {
+                    const produitId = parseInt(selectedOption.value);
+                    const produit = produitsData[produitId];
+                    if (produit) {
+                        const quantite = parseFloat(quantiteInput.value) || 0;
+                        total += produit.prix * quantite;
+                    }
+                }
+            }
+        });
+        
+        if (montantInput) {
+            montantInput.value = total.toFixed(2);
+        }
+    }
+    
+    // Fonction pour créer les options de produits
+    function createProduitOptions() {
+        let options = '<option value="">Sélectionnez un produit</option>';
+        for (const [id, produit] of Object.entries(produitsData)) {
+            options += `<option value="${id}" data-prix="${produit.prix}">${produit.nom} - ${produit.dosage} ${produit.unite} (${produit.forme})</option>`;
+        }
+        return options;
+    }
+    
+    // Ajouter un nouveau produit
+    if (addProduitBtn) {
+        addProduitBtn.addEventListener('click', function() {
+            const formNum = parseInt(totalForms.value);
+            const newForm = document.createElement('div');
+            newForm.className = 'produit-form mb-3 p-3 border rounded bg-light';
+            newForm.innerHTML = `
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Produit *</label>
+                        <select name="produits-${formNum}-produit" class="form-select select-produit" required>
+                            ${createProduitOptions()}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Quantité *</label>
+                        <input type="number" name="produits-${formNum}-quantite" class="form-control quantite-input" min="1" value="1" required>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <div class="form-check">
+                            <input type="checkbox" name="produits-${formNum}-DELETE" class="form-check-input">
+                            <label class="form-check-label">Supprimer</label>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" name="produits-${formNum}-id" value="">
+            `;
+            
+            produitsContainer.appendChild(newForm);
+            totalForms.value = formNum + 1;
+            
+            // Ajouter les événements pour le nouveau formulaire
+            const newProduitSelect = newForm.querySelector('.select-produit');
+            const newQuantiteInput = newForm.querySelector('.quantite-input');
+            const newDeleteCheckbox = newForm.querySelector('input[name*="-DELETE"]');
+            
+            if (newProduitSelect) {
+                newProduitSelect.addEventListener('change', calculerMontantTotal);
+            }
+            if (newQuantiteInput) {
+                newQuantiteInput.addEventListener('input', calculerMontantTotal);
+            }
+            if (newDeleteCheckbox) {
+                newDeleteCheckbox.addEventListener('change', calculerMontantTotal);
+            }
+        });
+    }
+    
+    // Ajouter les événements pour les formulaires existants
+    document.querySelectorAll('.select-produit').forEach(select => {
+        select.addEventListener('change', calculerMontantTotal);
+    });
+    
+    document.querySelectorAll('.quantite-input').forEach(input => {
+        input.addEventListener('input', calculerMontantTotal);
+    });
+    
+    document.querySelectorAll('input[name*="-DELETE"]').forEach(checkbox => {
+        checkbox.addEventListener('change', calculerMontantTotal);
+    });
+    
+    // Calculer le montant initial
+    calculerMontantTotal();
+});
+</script>
+{% endblock %} 

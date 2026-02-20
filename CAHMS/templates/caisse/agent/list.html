@@ -1,0 +1,131 @@
+{% extends 'caisse/base.html' %}
+
+{% block title %}Liste des Agents et Fonctions{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'caisse_dashboard' %}">
+                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-users me-1"></i>Agents & Fonctions
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Titre de la page -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-users me-2"></i>
+                Liste des Agents et leurs Fonctions
+            </h1>
+            <p class="text-muted">Consultation du personnel et de leurs rôles dans l'établissement</p>
+        </div>
+    </div>
+
+    <!-- Carte principale -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-list me-2"></i>
+                Personnel ({{ agents.count }} agent{{ agents.count|pluralize }})
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if agents %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Matricule</th>
+                                <th>Nom</th>
+                                <th>Post-nom</th>
+                                <th>Prénom</th>
+                                <th>Fonction</th>
+                                <th>Sexe</th>
+                                <th>Âge</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for agent in agents %}
+                            <tr>
+                                <td>{{ agent.matricule }}</td>
+                                <td>{{ agent.personne.nom }}</td>
+                                <td>{{ agent.personne.postnom }}</td>
+                                <td>{{ agent.personne.prenom }}</td>
+                                <td>{{ agent.fonction.designation }}</td>
+                                <td>{{ agent.personne.sexe }}</td>
+                                <td>{{ agent.personne.date_naissance|date:"d/m/Y" }}</td>
+                                <td>
+                                    <a href="{% url 'caisse_agent_detail' agent.id %}" class="btn btn-sm btn-outline-primary" title="Détail agent">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Aucun agent trouvé</h5>
+                    <p class="text-muted">Les agents apparaîtront ici une fois ajoutés par les gestionnaires.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Répartition par fonction -->
+    {% if agents %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        Répartition par Fonction
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% regroup agents by fonction as fonction_list %}
+                        {% for fonction in fonction_list %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-primary">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title text-primary">
+                                        <i class="fas fa-briefcase me-1"></i>
+                                        {{ fonction.grouper.designation }}
+                                    </h6>
+                                    <h3 class="text-primary">{{ fonction.list|length }}</h3>
+                                    <p class="text-muted mb-0">agent{{ fonction.list|length|pluralize }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Bouton de retour -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="{% url 'caisse_dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Retour au Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

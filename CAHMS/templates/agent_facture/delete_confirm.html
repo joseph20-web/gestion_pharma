@@ -1,0 +1,154 @@
+{% extends 'agent_facture/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Supprimer Commande #{{ commande.id }} - Agent Facturation{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- En-tête -->
+    <div class="col-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1 text-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirmer la suppression
+                </h2>
+                <p class="text-muted mb-0">Êtes-vous sûr de vouloir supprimer cette commande ?</p>
+            </div>
+            <div>
+                <a href="{% url 'agent_facture_commande_detail' commande.id %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Annuler
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Avertissement -->
+    <div class="col-12 mb-4">
+        <div class="alert alert-danger">
+            <h5 class="alert-heading">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Attention !
+            </h5>
+            <p class="mb-0">
+                Cette action est irréversible. La suppression de cette commande va :
+            </p>
+            <ul class="mb-0 mt-2">
+                <li>Supprimer définitivement la commande #{{ commande.id }}</li>
+                <li>Restaurer le stock des produits commandés</li>
+                <li>Supprimer tous les détails de la commande</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Informations de la commande -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Détails de la commande à supprimer
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">N° Commande :</label>
+                            <p class="mb-0">#{{ commande.id }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Date de commande :</label>
+                            <p class="mb-0">{{ commande.date_commande|date:"d/m/Y" }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Client :</label>
+                            <p class="mb-0">{{ commande.client.personne.nom }} {{ commande.client.personne.postnom }} {{ commande.client.personne.prenom }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Agent :</label>
+                            <p class="mb-0">{{ commande.agent.personne.nom }} {{ commande.agent.personne.postnom }} {{ commande.agent.personne.prenom }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Total :</label>
+                            <p class="mb-0 fw-bold text-primary">{{ commande.prix_total|floatformat:2 }} FC</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Produits :</label>
+                            <p class="mb-0">{{ lignes.count }} produit(s)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des produits -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-pills me-2"></i>
+                    Produits commandés (seront restaurés en stock)
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Produit</th>
+                                <th>Quantité commandée</th>
+                                <th>Stock actuel</th>
+                                <th>Stock après restauration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contenir in lignes %}
+                            <tr>
+                                <td>{{ contenir.produit.nom_produit }}</td>
+                                <td>{{ contenir.quantite }}</td>
+                                <td>{{ contenir.produit.quantite_stock }}</td>
+                                <td class="fw-bold text-success">{{ contenir.produit.quantite_stock|add:contenir.quantite }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Boutons d'action -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="mb-0 text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Cliquez sur "Confirmer la suppression" pour procéder
+                        </p>
+                    </div>
+                    <div>
+                        <a href="{% url 'agent_facture_commande_detail' commande.id %}" class="btn btn-secondary me-2">
+                            <i class="fas fa-times me-2"></i>
+                            Annuler
+                        </a>
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>
+                                Confirmer la suppression
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

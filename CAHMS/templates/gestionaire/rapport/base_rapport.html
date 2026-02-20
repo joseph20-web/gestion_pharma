@@ -1,0 +1,202 @@
+{% extends 'gestionaire/base.html' %}
+
+{% block extra_css %}
+<style>
+    /* Styles pour l'impression */
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+        
+        .print-only {
+            display: block !important;
+        }
+        
+        .card-modern {
+            border: 1px solid #ddd !important;
+            box-shadow: none !important;
+        }
+        
+        .table-modern {
+            border-collapse: collapse !important;
+        }
+        
+        .table-modern th,
+        .table-modern td {
+            border: 1px solid #ddd !important;
+            padding: 8px !important;
+        }
+        
+        .stats-card-modern {
+            border: 1px solid #ddd !important;
+            margin-bottom: 10px !important;
+        }
+        
+        .btn-modern {
+            display: none !important;
+        }
+        
+        .breadcrumb {
+            display: none !important;
+        }
+        
+        /* En-tête d'impression */
+        .print-header {
+            display: block !important;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .print-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .print-header p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* Informations de rapport */
+        .report-info {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+        }
+        
+        .report-info h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .report-info p {
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        
+        /* Statistiques d'impression */
+        .print-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .print-stat-item {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin: 5px;
+        }
+        
+        .print-stat-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .print-stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* Tableau d'impression */
+        .print-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .print-table th,
+        .print-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+        }
+        
+        .print-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        /* Pied de page d'impression */
+        .print-footer {
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+        }
+    }
+    
+    /* Masquer les éléments d'impression à l'écran */
+    .print-only {
+        display: none;
+    }
+    
+    /* Styles pour les boutons d'impression */
+    .print-btn {
+        background: #1677ff;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    
+    .print-btn:hover {
+        background: #0056b3;
+    }
+    
+    .export-btn {
+        background: #198754;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-left: 10px;
+    }
+    
+    .export-btn:hover {
+        background: #146c43;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Fonction pour l'impression
+    function printReport() {
+        window.print();
+    }
+    
+    // Fonction pour l'export PDF (placeholder)
+    function exportPDF() {
+        alert('Fonctionnalité d\'export PDF à implémenter');
+    }
+    
+    // Fonction pour formater les nombres
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    }
+    
+    // Fonction pour formater les montants
+    function formatCurrency(amount) {
+        return formatNumber(amount) + ' FC';
+    }
+</script>
+{% endblock %} 

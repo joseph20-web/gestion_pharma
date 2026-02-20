@@ -1,0 +1,105 @@
+{% extends 'gestionaire/base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block title %}{{ title }} - Approvisionnement{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">{{ title }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" autocomplete="off">
+                        {% csrf_token %}
+                        {{ formset.management_form }}
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3">
+                                {{ form.sortie_fond.label_tag }} 
+                                {{ form.sortie_fond|add_class:"form-select" }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.date_approvisionnement.label_tag }}
+                                {{ form.date_approvisionnement|add_class:"form-control"|attr:"type:date" }}
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                {{ form.observation.label_tag }}
+                                {{ form.observation|add_class:"form-control" }}
+                            </div>
+                        </div>
+                        <hr>
+                        <h6 class="text-success mb-3"><i class="fas fa-pills me-2"></i>Produits à approvisionner</h6>
+                        <div id="formset-area">
+                            {% for f in formset %}
+                            <div class="row g-2 align-items-end mb-2 formset-row border rounded p-2 bg-light">
+                                <div class="col-md-7">
+                                    {{ f.produit.label_tag }}
+                                    {{ f.produit|add_class:'form-select' }}
+                                </div>
+                                <div class="col-md-3">
+                                    {{ f.quantite.label_tag }}
+                                    {{ f.quantite|add_class:'form-control'|attr:'min:1' }}
+                                </div>
+                                <div class="col-md-2 d-flex align-items-center">
+                                    {% if formset.can_delete %}
+                                        <button type="button" class="btn btn-outline-danger btn-remove-row" title="Supprimer ce produit">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        {{ f.DELETE }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div id="empty-form" class="d-none">
+                            <div class="row g-2 align-items-end mb-2 formset-row border rounded p-2 bg-light">
+                                <div class="col-md-7">
+                                    {{ formset.empty_form.produit.label_tag }}
+                                    {{ formset.empty_form.produit|add_class:'form-select' }}
+                                </div>
+                                <div class="col-md-3">
+                                    {{ formset.empty_form.quantite.label_tag }}
+                                    {{ formset.empty_form.quantite|add_class:'form-control'|attr:'min:1' }}
+                                </div>
+                                <div class="col-md-2 d-flex align-items-center">
+                                    <button type="button" class="btn btn-outline-danger btn-remove-row" title="Supprimer ce produit">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {{ formset.empty_form.DELETE }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-outline-success" id="add-row-btn">
+                                <i class="fas fa-plus me-2"></i>Ajouter un produit
+                            </button>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{% url 'approvisionnement_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+window.PRODUIT_PRIX = {
+    {% for produit in formset.empty_form.fields.produit.queryset %}
+        "{{ produit.pk }}": {{ produit.prix_unitaire|floatformat:2 }}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+};
+</script>
+<script src="{% static 'js/approvisionnement_form.js' %}"></script>
+{% endblock %}

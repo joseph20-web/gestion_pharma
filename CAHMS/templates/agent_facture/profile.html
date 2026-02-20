@@ -1,0 +1,261 @@
+{% extends 'agent_facture/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Mon Profil - Agent Facturation{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- En-tête -->
+    <div class="col-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="fas fa-user-circle me-2"></i>
+                    Mon Profil
+                </h2>
+                <p class="text-muted mb-0">Informations personnelles et professionnelles</p>
+            </div>
+            <div>
+                <a href="{% url 'agent_facture_dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Retour au Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informations du profil -->
+    <div class="col-12">
+        <div class="row">
+            <!-- Informations personnelles -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user me-2"></i>
+                            Informations Personnelles
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted">
+                                    <i class="fas fa-id-card me-1"></i>
+                                    Nom
+                                </label>
+                                <p class="form-control-plaintext">{{ personne.nom }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted">
+                                    <i class="fas fa-id-card me-1"></i>
+                                    Postnom
+                                </label>
+                                <p class="form-control-plaintext">{{ personne.postnom }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted">
+                                    <i class="fas fa-id-card me-1"></i>
+                                    Prénom
+                                </label>
+                                <p class="form-control-plaintext">{{ personne.prenom }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted">
+                                    <i class="fas fa-venus-mars me-1"></i>
+                                    Sexe
+                                </label>
+                                <p class="form-control-plaintext">
+                                    {% if personne.sexe == 'M' %}
+                                        <span class="badge bg-primary">Masculin</span>
+                                    {% elif personne.sexe == 'F' %}
+                                        <span class="badge bg-pink">Féminin</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Non spécifié</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold text-muted">
+                                    <i class="fas fa-birthday-cake me-1"></i>
+                                    Date de naissance
+                                </label>
+                                <p class="form-control-plaintext">
+                                    {% if personne.date_naissance %}
+                                        {{ personne.date_naissance|date:"d/m/Y" }}
+                                    {% else %}
+                                        <span class="text-muted">Non spécifiée</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informations professionnelles -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-briefcase me-2"></i>
+                            Informations Professionnelles
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-bold text-muted">
+                                    <i class="fas fa-user-tie me-1"></i>
+                                    Fonction
+                                </label>
+                                <p class="form-control-plaintext">
+                                    {% if agent.fonction %}
+                                        <span class="badge bg-success">{{ agent.fonction.nom_fonction }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Non spécifiée</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold text-muted">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    Date d'embauche
+                                </label>
+                                <p class="form-control-plaintext">
+                                    {% if agent.date_embauche %}
+                                        {{ agent.date_embauche|date:"d/m/Y" }}
+                                    {% else %}
+                                        <span class="text-muted">Non spécifiée</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold text-muted">
+                                    <i class="fas fa-id-badge me-1"></i>
+                                    Numéro d'employé
+                                </label>
+                                <p class="form-control-plaintext">
+                                    {% if agent.numero_employe %}
+                                        <span class="badge bg-info">{{ agent.numero_employe }}</span>
+                                    {% else %}
+                                        <span class="text-muted">Non spécifié</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    Statut
+                                </label>
+                                <p class="form-control-plaintext">
+                                    {% if agent.actif %}
+                                        <span class="badge bg-success">Actif</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactif</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informations de compte -->
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-shield-alt me-2"></i>
+                            Informations de Compte
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted">
+                                    <i class="fas fa-user me-1"></i>
+                                    Nom d'utilisateur
+                                </label>
+                                <p class="form-control-plaintext">{{ request.user.username }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted">
+                                    <i class="fas fa-envelope me-1"></i>
+                                    Email
+                                </label>
+                                <p class="form-control-plaintext">
+                                    {% if request.user.email %}
+                                        {{ request.user.email }}
+                                    {% else %}
+                                        <span class="text-muted">Non spécifié</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted">
+                                    <i class="fas fa-calendar-check me-1"></i>
+                                    Date de création du compte
+                                </label>
+                                <p class="form-control-plaintext">{{ request.user.date_joined|date:"d/m/Y à H:i" }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted">
+                                    <i class="fas fa-sign-in-alt me-1"></i>
+                                    Dernière connexion
+                                </label>
+                                <p class="form-control-plaintext">
+                                    {% if request.user.last_login %}
+                                        {{ request.user.last_login|date:"d/m/Y à H:i" }}
+                                    {% else %}
+                                        <span class="text-muted">Jamais connecté</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistiques de l'agent -->
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Mes Statistiques
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <div class="stats-card success text-center">
+                                    <h3 class="mb-1">{{ commandes_count|default:0 }}</h3>
+                                    <p class="mb-0">Commandes créées</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stats-card warning text-center">
+                                    <h3 class="mb-1">{{ clients_count|default:0 }}</h3>
+                                    <p class="mb-0">Clients gérés</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stats-card text-center">
+                                    <h3 class="mb-1">{{ total_ventes|default:0|floatformat:2 }}</h3>
+                                    <p class="mb-0">Total des ventes (FC)</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stats-card danger text-center">
+                                    <h3 class="mb-1">{{ commandes_ce_mois|default:0 }}</h3>
+                                    <p class="mb-0">Commandes ce mois</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

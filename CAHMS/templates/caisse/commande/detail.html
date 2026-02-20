@@ -1,0 +1,127 @@
+{% extends 'caisse/base.html' %}
+
+{% block title %}Détails Commande #{{ commande.id }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'caisse_dashboard' %}"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'caisse_commande_list' %}"><i class="fas fa-shopping-cart me-1"></i>Commandes Clients</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-eye me-1"></i>Détails Commande #{{ commande.id }}
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Titre de la page -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-shopping-cart me-2"></i>
+                Détails de la Commande #{{ commande.id }}
+            </h1>
+            <p class="text-muted">Informations complètes sur cette commande client</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Informations de la commande -->
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Informations Générales
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-primary">
+                            <i class="fas fa-hashtag me-1"></i>Numéro de Commande
+                        </label>
+                        <p class="mb-0">
+                            <span class="badge bg-primary fs-6">#{{ commande.id }}</span>
+                        </p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-primary">
+                            <i class="fas fa-calendar me-1"></i>Date de Commande
+                        </label>
+                        <p class="mb-0">{{ commande.date_commande|date:"d/m/Y" }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-primary">
+                            <i class="fas fa-user me-1"></i>Client
+                        </label>
+                        <p class="mb-0">
+                            {{ commande.client.personne.nom }} {{ commande.client.personne.postnom }} {{ commande.client.personne.prenom }}
+                        </p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-primary">
+                            <i class="fas fa-user-tie me-1"></i>Agent
+                        </label>
+                        <p class="mb-0">
+                            {{ commande.agent.personne.nom }} {{ commande.agent.personne.postnom }} ({{ commande.agent.fonction.designation }})
+                        </p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-primary">
+                            <i class="fas fa-dollar-sign me-1"></i>Prix Total
+                        </label>
+                        <p class="mb-0">
+                            <span class="badge bg-success fs-6">
+                                {{ commande.prix_total|floatformat:2 }} FC
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Détail des produits commandés -->
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-boxes me-2"></i>
+                        Produits Commandés
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if lignes %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Produit</th>
+                                        <th>Quantité</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ligne in lignes %}
+                                    <tr>
+                                        <td>{{ ligne.produit.nom_produit }}</td>
+                                        <td>{{ ligne.quantite }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-boxes fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Aucun produit dans cette commande</h5>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

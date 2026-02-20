@@ -1,0 +1,192 @@
+{% extends 'gestionaire/base.html' %}
+
+{% block title %}Dashboard Gestionnaire de Stock{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="mb-4 animate-fade-in">
+    <ol class="breadcrumb bg-light rounded shadow-sm px-4 py-3">
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="fas fa-warehouse me-2"></i>Dashboard Gestionnaire de Stock
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block page_header %}
+<div class="mb-4 animate-slide-in">
+    <h1 class="h3 mb-1 text-dark">
+        <i class="fas fa-warehouse me-2"></i>Dashboard Gestionnaire de Stock
+    </h1>
+    <p class="text-muted">Bienvenue dans votre espace de gestion des stocks pharmaceutiques</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-box-open fa-2x text-primary"></i>
+                </div>
+                <h5 class="card-title text-dark">Produits</h5>
+                <h2 class="text-primary mb-0">{{ nb_produits_en_stock|default:0 }}</h2>
+                <small class="text-muted">En stock</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+                </div>
+                <h5 class="card-title text-dark">Alertes</h5>
+                <h2 class="text-warning mb-0">{{ alertes_stock_faible|default:0 }}</h2>
+                <small class="text-muted">Stock faible</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-clock fa-2x text-warning"></i>
+                </div>
+                <h5 class="card-title text-dark">Expiration Proche</h5>
+                <h2 class="text-warning mb-0">{{ produits_expiration_proche|default:0 }}</h2>
+                <small class="text-muted">Dans 10 jours</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-truck fa-2x text-info"></i>
+                </div>
+                <h5 class="card-title text-dark">Réceptions</h5>
+                <h2 class="text-info mb-0">{{ receptions_aujourd_hui|default:0 }}</h2>
+                <small class="text-muted">Aujourd'hui</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0 text-dark">
+                    <i class="fas fa-bolt me-2"></i>Actions Rapides
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <a href="{% url 'demande_fond_create' %}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-file-invoice me-2"></i>Créer une demande de fonds
+                        </a>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <a href="{% url 'approvisionnement_create' %}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-truck me-2"></i>Enregistrer une réception
+                        </a>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <a href="{% url 'perte_create' %}" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Déclarer une perte
+                        </a>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <a href="{% url 'stock_list' %}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-chart-line me-2"></i>Consulter le stock
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0 text-dark">
+                    <i class="fas fa-clock me-2"></i>Activité Récente
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if activites_recent %}
+                    <ul class="list-unstyled mb-0">
+                        {% for act in activites_recent %}
+                        <li class="mb-2">{{ act }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <span class="text-muted">Aucune activité récente</span>
+                    <ul class="text-muted small mt-2">
+                        <li>Aucun produit n'expire bientôt</li>
+                        <li>Aucune réception aujourd'hui</li>
+                        <li>Aucune perte déclarée</li>
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0 text-dark">
+                    <i class="fas fa-compass me-2"></i>Navigation Complète
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <h6 class="fw-bold text-primary mb-2">
+                            <i class="fas fa-file-invoice me-2"></i>Gestion des Demandes de Fonds
+                        </h6>
+                        <ul class="list-unstyled small">
+                            <li><a href="{% url 'demande_fond_create' %}" class="text-decoration-none">• Créer une demande de fonds</a></li>
+                            <li><a href="{% url 'demande_fond_list' %}" class="text-decoration-none">• Consulter les demandes</a></li>
+                            <li><a href="#" class="text-decoration-none">• Suivre les demandes</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6 class="fw-bold text-success mb-2">
+                            <i class="fas fa-truck me-2"></i>Gestion des Réceptions
+                        </h6>
+                        <ul class="list-unstyled small">
+                            <li><a href="{% url 'approvisionnement_create' %}" class="text-decoration-none">• Enregistrer une réception</a></li>
+                            <li><a href="{% url 'approvisionnement_list' %}" class="text-decoration-none">• Historique des réceptions</a></li>
+                            <li><a href="#" class="text-decoration-none">• Vérifier les livraisons</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6 class="fw-bold text-warning mb-2">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Gestion des Pertes
+                        </h6>
+                        <ul class="list-unstyled small">
+                            <li><a href="{% url 'perte_create' %}" class="text-decoration-none">• Déclarer une perte</a></li>
+                            <li><a href="{% url 'perte_list' %}" class="text-decoration-none">• Consulter les pertes</a></li>
+                            <li><a href="{% url 'rapport_pertes' %}" class="text-decoration-none">• Rapports de pertes</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6 class="fw-bold text-info mb-2">
+                            <i class="fas fa-chart-line me-2"></i>Stock et Statistiques
+                        </h6>
+                        <ul class="list-unstyled small">
+                            <li><a href="{% url 'stock_list' %}" class="text-decoration-none">• Consulter le stock</a></li>
+                            <li><a href="{% url 'produit_list' %}" class="text-decoration-none">• Gérer les produits</a></li>
+                            <li><a href="{% url 'rapport_index' %}" class="text-decoration-none">• Rapports et analyses</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

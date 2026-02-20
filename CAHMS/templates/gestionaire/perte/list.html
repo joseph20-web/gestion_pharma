@@ -1,0 +1,73 @@
+{% extends 'gestionaire/base.html' %}
+
+{% block title %}Liste des Pertes - Gestionnaire{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-exclamation-triangle me-2"></i>Liste des pertes</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'perte_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Nouvelle Perte
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if pertes %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Code</th>
+                            <th>Produit</th>
+                            <th>Quantité</th>
+                            <th>Date</th>
+                            <th>Agent</th>
+                            <th>Type de perte</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for perte in pertes %}
+                        <tr>
+                            <td>{{ perte.id }}</td>
+                            <td>
+                                {% if perte.encaisse_set.first %}
+                                    {{ perte.encaisse_set.first.produit.nom_produit }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ perte.quantite_perdue }}</td>
+                            <td>{{ perte.date_perte|date:"d/m/Y" }}</td>
+                            <td>{{ perte.agent.personne.nom }} {{ perte.agent.personne.prenom }}</td>
+                            <td>{{ perte.type_perte.designation }}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'perte_update' perte.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'perte_delete' perte.id %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-exclamation-triangle fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">Aucune perte enregistrée</h4>
+                <p class="text-muted">Commencez par enregistrer votre première perte.</p>
+                <a href="{% url 'perte_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Déclarer une Perte
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

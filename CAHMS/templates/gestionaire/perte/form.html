@@ -1,0 +1,212 @@
+{% extends 'gestionaire/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }} - Gestionnaire{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <!-- Header avec navigation -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+                    <div class="bg-primary rounded-circle p-3 me-3">
+            <i class="fas fa-exclamation-triangle text-white fs-4"></i>
+        </div>
+            <div>
+                <h1 class="h3 mb-1 text-dark fw-bold">{{ title }}</h1>
+                <p class="text-muted mb-0">Déclarer une perte de stock</p>
+            </div>
+        </div>
+        <a href="{% url 'perte_list' %}" class="btn btn-outline-primary d-flex align-items-center">
+            <i class="fas fa-arrow-left me-2"></i>
+            Retour à la liste
+        </a>
+    </div>
+
+    <!-- Formulaire principal -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-gradient-primary text-white py-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3">
+                            <i class="fas fa-edit text-white"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-0 fw-bold">Déclarer une Perte</h5>
+                            <small class="opacity-75">Remplissez tous les champs obligatoires</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body p-4">
+                    <form method="post" autocomplete="off" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Informations du produit -->
+                        <div class="row g-4 mb-4">
+                            <div class="col-12 col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-pills"></i>
+                                    </span>
+                                    {{ form.produit|add_class:'form-select' }}
+                                </div>
+                                <label for="{{ form.produit.id_for_label }}" class="form-label mt-1">
+                                    <i class="fas fa-medicine me-2"></i>Produit *
+                                </label>
+                                {% if form.produit.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.produit.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-12 col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-balance-scale"></i>
+                                    </span>
+                                    {{ form.quantite_perdue|add_class:'form-control'|attr:'placeholder:Nombre d\'unités perdues' }}
+                                </div>
+                                <label for="{{ form.quantite_perdue.id_for_label }}" class="form-label mt-1">
+                                    <i class="fas fa-minus-circle me-2"></i>Quantité perdue *
+                                </label>
+                                {% if form.quantite_perdue.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.quantite_perdue.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Date et Agent -->
+                        <div class="row g-4 mb-4">
+                            <div class="col-12 col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </span>
+                                    {{ form.date_perte|add_class:'form-control'|attr:'type:date' }}
+                                </div>
+                                <label for="{{ form.date_perte.id_for_label }}" class="form-label mt-1">
+                                    <i class="fas fa-calendar me-2"></i>Date de la perte *
+                                </label>
+                                {% if form.date_perte.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.date_perte.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-12 col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                    {{ form.agent|add_class:'form-select' }}
+                                </div>
+                                <label for="{{ form.agent.id_for_label }}" class="form-label mt-1">
+                                    <i class="fas fa-user-tie me-2"></i>Agent *
+                                </label>
+                                {% if form.agent.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.agent.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Type de perte -->
+                        <div class="row g-4 mb-4">
+                            <div class="col-12">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </span>
+                                    {{ form.type_perte|add_class:'form-select' }}
+                                </div>
+                                <label for="{{ form.type_perte.id_for_label }}" class="form-label mt-1">
+                                    <i class="fas fa-tag me-2"></i>Type de perte *
+                                </label>
+                                {% if form.type_perte.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.type_perte.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Informations importantes -->
+                        <div class="alert alert-info d-flex align-items-start mb-4">
+                            <i class="fas fa-info-circle me-2 mt-1"></i>
+                            <div>
+                                <strong>Important :</strong>
+                                <small class="d-block">
+                                    La déclaration de perte permet de maintenir un inventaire précis et d'identifier les causes des pertes pour améliorer la gestion du stock.
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Boutons d'action -->
+                        <div class="d-flex justify-content-end gap-3 pt-3 border-top">
+                            <a href="{% url 'perte_list' %}" class="btn btn-outline-secondary px-4 py-2">
+                                <i class="fas fa-times me-2"></i>
+                                Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 py-2 shadow-sm">
+                                <i class="fas fa-save me-2"></i>
+                                Déclarer la Perte
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.input-group-text {
+    background: #f4f6fb;
+    border: 1px solid #e9ecef;
+    color: #764ba2;
+    font-size: 1.1rem;
+}
+
+.form-control, .form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.card {
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.btn {
+    border-radius: 0.75rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.alert {
+    border-radius: 0.75rem;
+    border: none;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #6c757d;
+}
+</style>
+{% endblock %} 

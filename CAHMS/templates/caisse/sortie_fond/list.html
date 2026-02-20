@@ -1,0 +1,66 @@
+{% extends 'caisse/base.html' %}
+
+{% block title %}Liste des Sorties de Fond{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'caisse_dashboard' %}"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><i class="fas fa-arrow-circle-up me-1"></i>Sorties de Fond</li>
+        </ol>
+    </nav>
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-arrow-circle-up me-2"></i>Liste des Sorties de Fond</h1>
+                <p class="text-muted">Consultation des sorties de fond enregistrées</p>
+            </div>
+            <a href="{% url 'caisse_sortie_fond_create' %}" class="btn btn-success"><i class="fas fa-plus me-1"></i> Nouvelle Sortie de Fond</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header"><h5 class="card-title mb-0"><i class="fas fa-list me-2"></i>Sorties de Fond ({{ sorties.count }})</h5></div>
+        <div class="card-body">
+            {% if sorties %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Montant</th>
+                            <th>Motif</th>
+                            <th>Agent</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sortie in sorties %}
+                        <tr>
+                            <td>#{{ sortie.id }}</td>
+                            <td>{{ sortie.date_sortie|date:"d/m/Y" }}</td>
+                            <td>{{ sortie.montant|floatformat:2 }} FC</td>
+                            <td>{{ sortie.motif|truncatechars:30 }}</td>
+                            <td>{{ sortie.agent.personne.nom }} {{ sortie.agent.personne.postnom }}</td>
+                            <td>
+                                <a href="{% url 'caisse_sortie_fond_detail' sortie.id %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></a>
+                                <a href="{% url 'caisse_sortie_fond_delete' sortie.id %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></a>
+                                <a href="{% url 'caisse_sortie_fond_update' sortie.id %}" class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></a>
+                                <a href="{% url 'caisse_sortie_fond_print' sortie.id %}" class="btn btn-sm btn-outline-secondary" target="_blank"><i class="fas fa-print"></i></a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-arrow-circle-up fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Aucune sortie de fond trouvée</h5>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

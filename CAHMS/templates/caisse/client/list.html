@@ -1,0 +1,84 @@
+{% extends 'caisse/base.html' %}
+
+{% block title %}Liste des Clients{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'caisse_dashboard' %}">
+                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-user-friends me-1"></i>Clients
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Titre de la page -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-user-friends me-2"></i>
+                Liste des Clients
+            </h1>
+            <p class="text-muted">Consultation de la base de données des clients</p>
+        </div>
+    </div>
+
+    <!-- Carte principale -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-list me-2"></i>
+                Base Clients ({{ clients.count }} client{{ clients.count|pluralize }})
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if clients %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Code Client</th>
+                                <th>Nom</th>
+                                <th>Post-nom</th>
+                                <th>Prénom</th>
+                                <th>Sexe</th>
+                                <th>Âge</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for client in clients %}
+                            <tr>
+                                <td><span class="badge bg-primary">#{{ client.id }}</span></td>
+                                <td>{{ client.personne.nom }}</td>
+                                <td>{{ client.personne.postnom }}</td>
+                                <td>{{ client.personne.prenom }}</td>
+                                <td>{{ client.personne.sexe }}</td>
+                                <td>{{ client.personne.date_naissance|date:"d/m/Y" }}</td>
+                                <td>
+                                    <a href="{% url 'caisse_client_detail' client.id %}" class="btn btn-sm btn-outline-primary" title="Détail client">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-user-friends fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Aucun client trouvé</h5>
+                    <p class="text-muted">Les clients apparaîtront ici une fois ajoutés par les gestionnaires.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

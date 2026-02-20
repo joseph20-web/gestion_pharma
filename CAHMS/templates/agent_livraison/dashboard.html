@@ -1,0 +1,37 @@
+{% extends 'agent_livraison/base.html' %}
+
+{% block title %}Dashboard Agent de Livraison{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-truck me-2"></i>
+                Tableau de bord - Agent de Livraison
+            </h1>
+            <p class="text-muted">Accès rapide aux principales fonctionnalités</p>
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <a href="{% url 'agent_livraison_stock' %}" class="card text-decoration-none h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-warehouse fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">Vérifier le Stock</h5>
+                    <p class="card-text text-muted">Consulter les produits disponibles en stock avant de servir au client.</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a href="{% url 'agent_livraison_facture_verification' %}" class="card text-decoration-none h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-file-invoice fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Vérifier la Facture</h5>
+                    <p class="card-text text-muted">Vérifier la validité de la facture avant livraison au client.</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

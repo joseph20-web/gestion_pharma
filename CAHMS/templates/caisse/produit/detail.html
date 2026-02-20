@@ -1,0 +1,65 @@
+{% extends 'caisse/base.html' %}
+
+{% block title %}Détail Produit {{ produit.code_produit }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'caisse_dashboard' %}"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'caisse_produit_list' %}"><i class="fas fa-pills me-1"></i>Produits</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-eye me-1"></i>Détail Produit {{ produit.code_produit }}
+            </li>
+        </ol>
+    </nav>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-6 mb-0">
+                <i class="fas fa-pills me-2 text-primary"></i>
+                Détail du Produit <span class="text-primary">{{ produit.code_produit }}</span>
+            </h1>
+            <p class="text-muted">Informations complètes sur ce produit</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Informations Produit
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Code Produit</dt>
+                        <dd class="col-sm-8">{{ produit.code_produit }}</dd>
+                        <dt class="col-sm-4">Nom</dt>
+                        <dd class="col-sm-8">{{ produit.nom_produit }}</dd>
+                        <dt class="col-sm-4">Dosage</dt>
+                        <dd class="col-sm-8">{{ produit.dosage }}</dd>
+                        <dt class="col-sm-4">Forme</dt>
+                        <dd class="col-sm-8">{{ produit.get_forme_display }}</dd>
+                        <dt class="col-sm-4">Unité</dt>
+                        <dd class="col-sm-8">{{ produit.get_unite_display }}</dd>
+                        <dt class="col-sm-4">Date d'expiration</dt>
+                        <dd class="col-sm-8">{{ produit.date_expiration|date:'d/m/Y' }}</dd>
+                        <dt class="col-sm-4">Prix unitaire</dt>
+                        <dd class="col-sm-8">{{ produit.prix_unitaire }}</dd>
+                        <dt class="col-sm-4">Quantité en stock</dt>
+                        <dd class="col-sm-8">{{ produit.quantite_stock }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

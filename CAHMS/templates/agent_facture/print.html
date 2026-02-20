@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Facture Commande #{{ commande.id }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @media print {
+            .no-print { display: none; }
+            .etat-container { box-shadow: none !important; border: none !important; }
+            body { margin: 0; padding: 0; }
+        }
+        body {
+            background: #f4f6f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .etat-container {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(44, 62, 80, 0.08);
+            padding: 2.5rem 2.5rem 2rem 2.5rem;
+            margin: 2rem auto;
+            max-width: 900px;
+            border: 1.5px solid #e0e6ed;
+        }
+        .etat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+        .etat-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .etat-abbr {
+            font-size: 1.1rem;
+            color: #8e44ad;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+        .etat-table th, .etat-table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+        .etat-section-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #8e44ad;
+            margin-bottom: 0.5rem;
+            margin-top: 1.5rem;
+        }
+        .etat-info {
+            font-size: 1.05rem;
+        }
+        .signature-zone {
+            margin-top: 3rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature-block {
+            width: 40%;
+            text-align: center;
+        }
+        .signature-label {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+            margin-bottom: 2.5rem;
+        }
+        .signature-line {
+            border-bottom: 1.5px solid #bbb;
+            margin: 2.5rem 0 0.5rem 0;
+            height: 2.5rem;
+        }
+        .facture-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #8e44ad;
+        }
+        .total-section {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        .total-amount {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="etat-container" id="facture-commande">
+        <div class="etat-header">
+            <div>
+                <div class="etat-title">Centre d'Assistance Medico-Humanitaire Espoir</div>
+                <div class="etat-abbr">CAMHS</div>
+                <div class="text-muted mt-2">Facture de Commande</div>
+            </div>
+            <div class="text-end">
+                <div class="facture-number">Facture #{{ commande.id }}</div>
+                <div class="text-muted">Date d'impression :</div>
+                <div class="fw-bold">{{ date_du_jour|date:"d/m/Y" }}</div>
+            </div>
+        </div>
+        <hr>
+        
+        <!-- Informations de la commande -->
+        <div class="etat-section-title">Informations de la Commande</div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="etat-info mb-3">
+                    <strong>N° Commande :</strong> #{{ commande.id }}<br>
+                    <strong>Date de commande :</strong> {{ commande.date_commande|date:"d/m/Y" }}<br>
+                    <strong>Agent de facturation :</strong> 
+                    {% if user.agent %}
+                        {{ user.agent.personne.nom }} {{ user.agent.personne.prenom }}
+                    {% else %}
+                        {{ user.get_full_name|default:user.username }}
+                    {% endif %}<br>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="etat-info mb-3">
+                    <strong>Client :</strong> {{ commande.client.personne.nom }} {{ commande.client.personne.postnom }} {{ commande.client.personne.prenom }}<br>
+                    <strong>Sexe :</strong> {{ commande.client.personne.get_sexe_display }}<br>
+                    <strong>Date de naissance :</strong> {{ commande.client.personne.date_naissance|date:"d/m/Y" }}<br>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Détail des produits -->
+        <div class="etat-section-title">Détail des Produits</div>
+        <table class="table table-bordered etat-table">
+            <thead class="table-light">
+                <tr>
+                    <th>Code</th>
+                    <th>Nom Produit</th>
+                    <th>Dosage</th>
+                    <th>Forme</th>
+                    <th>Quantité</th>
+                    <th>Prix Unitaire</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ligne in lignes %}
+                <tr>
+                    <td>{{ ligne.produit.code_produit }}</td>
+                    <td>{{ ligne.produit.nom_produit }}</td>
+                    <td>{{ ligne.produit.dosage }} {{ ligne.produit.unite }}</td>
+                    <td>{{ ligne.produit.get_forme_display }}</td>
+                    <td>{{ ligne.quantite }}</td>
+                    <td>{{ ligne.prix_unitaire|floatformat:2 }} FC</td>
+                    <td>{{ ligne.total_ligne|floatformat:2 }} FC</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="table-primary">
+                    <th colspan="6" class="text-end">Total de la Commande</th>
+                    <th class="total-amount">{{ commande.prix_total|floatformat:2 }} FC</th>
+                </tr>
+            </tfoot>
+        </table>
+        
+        <!-- Section total -->
+        <div class="total-section">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="etat-info">
+                        <strong>Nombre de produits :</strong> {{ lignes|length }}<br>
+                        <strong>Date de création :</strong> {{ commande.date_commande|date:"d/m/Y" }}<br>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="etat-info">
+                        <strong>Montant Total :</strong><br>
+                        <span class="total-amount">{{ commande.prix_total|floatformat:2 }} FC</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Signatures -->
+        <div class="signature-zone">
+            <div class="signature-block">
+                <div class="signature-label">Signature de l'Agent de Facturation</div>
+                <div class="signature-line"></div>
+                <div>
+                    {% if user.agent %}
+                        {{ user.agent.personne.nom }} {{ user.agent.personne.prenom }}
+                    {% else %}
+                        {{ user.get_full_name|default:user.username }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="signature-block">
+                <div class="signature-label">Signature du Client</div>
+                <div class="signature-line"></div>
+                <div>{{ commande.client.personne.nom }} {{ commande.client.personne.postnom }}</div>
+            </div>
+        </div>
+        
+        <!-- Bouton d'impression -->
+        <div class="text-center mt-4 no-print">
+            <button class="btn btn-outline-secondary me-2" onclick="window.print()">
+                <i class="fas fa-print me-1"></i> Imprimer la facture
+            </button>
+            <a href="{% url 'agent_facture_commande_list' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+            </a>
+        </div>
+    </div>
+</body>
+</html> 

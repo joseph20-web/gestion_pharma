@@ -1,0 +1,99 @@
+{% extends 'caisse/base.html' %}
+
+{% block title %}Liste des Commandes Clients{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'caisse_dashboard' %}">
+                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-shopping-cart me-1"></i>Commandes Clients
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Titre de la page -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-shopping-cart me-2"></i>
+                Liste des Commandes Clients
+            </h1>
+            <p class="text-muted">Consultation des commandes passées par les clients</p>
+        </div>
+    </div>
+
+    <!-- Carte principale -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-list me-2"></i>
+                Commandes Clients ({{ commandes.count }} commande{{ commandes.count|pluralize }})
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if commandes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>N° Commande</th>
+                                <th>Client</th>
+                                <th>Date Commande</th>
+                                <th>Agent</th>
+                                <th>Prix Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for commande in commandes %}
+                            <tr>
+                                <td><span class="badge bg-primary">#{{ commande.id }}</span></td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-user me-2 text-primary"></i>
+                                        <div>
+                                            <strong>{{ commande.client.personne.nom }} {{ commande.client.personne.postnom }}</strong><br>
+                                            <small class="text-muted">{{ commande.client.personne.prenom }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <i class="fas fa-calendar me-1 text-info"></i>
+                                    {{ commande.date_commande|date:"d/m/Y" }}
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-user-tie me-2 text-success"></i>
+                                        <div>
+                                            <strong>{{ commande.agent.personne.nom }} {{ commande.agent.personne.postnom }}</strong><br>
+                                            <small class="text-muted">{{ commande.agent.fonction.designation }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success fs-6">
+                                        {{ commande.prix_total|floatformat:2 }} FC
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Aucune commande trouvée</h5>
+                    <p class="text-muted">Les commandes apparaîtront ici une fois enregistrées.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

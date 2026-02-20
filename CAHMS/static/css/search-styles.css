@@ -1,0 +1,128 @@
+/* Styles pour le champ de recherche des produits */
+
+.search-input-group {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.search-input-group:focus-within {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#search-produit {
+    border-radius: 20px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+    padding-left: 45px;
+}
+
+#search-produit:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+    outline: none;
+}
+
+.search-input-group .input-group-text {
+    background: transparent;
+    border: none;
+    position: absolute;
+    left: 15px;
+    z-index: 10;
+    color: #6c757d;
+}
+
+#search-produit:focus + .input-group-text {
+    color: #007bff;
+}
+
+/* Animation pour les lignes qui apparaissent/disparaissent */
+.produit-row {
+    transition: all 0.3s ease;
+}
+
+.produit-row[style*="display: none"] {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+/* Style pour le message "aucun résultat" */
+.no-results {
+    background-color: #f8f9fa;
+    border-left: 4px solid #dc3545;
+}
+
+.no-results td {
+    padding: 2rem !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .card-header .row {
+        flex-direction: column;
+    }
+    
+    .card-header .col-md-6 {
+        margin-bottom: 1rem;
+    }
+    
+    #search-produit {
+        font-size: 16px; /* Évite le zoom sur iOS */
+    }
+}
+
+/* Animation de chargement */
+.search-loading {
+    position: relative;
+}
+
+.search-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    width: 16px;
+    height: 16px;
+    margin-top: -8px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Highlight des résultats de recherche */
+.highlight {
+    background-color: #fff3cd;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+/* Styles spécifiques pour la recherche de stock */
+#search-stock {
+    border-radius: 20px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+    padding-left: 45px;
+}
+
+#search-stock:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+    outline: none;
+}
+
+/* Animation pour les lignes de stock */
+.stock-row {
+    transition: all 0.3s ease;
+}
+
+.stock-row[style*="display: none"] {
+    opacity: 0;
+    transform: translateX(-10px);
+} 

@@ -1,0 +1,59 @@
+{% extends 'caisse/base.html' %}
+
+{% block title %}Détail Client #{{ client.id }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'caisse_dashboard' %}"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'caisse_client_list' %}"><i class="fas fa-user-friends me-1"></i>Clients</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-eye me-1"></i>Détail Client #{{ client.id }}
+            </li>
+        </ol>
+    </nav>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-6 mb-0">
+                <i class="fas fa-user-friends me-2 text-primary"></i>
+                Détail du Client <span class="text-primary">#{{ client.id }}</span>
+            </h1>
+            <p class="text-muted">Informations complètes sur ce client</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Informations Client
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Nom</dt>
+                        <dd class="col-sm-8">{{ client.personne.nom }}</dd>
+                        <dt class="col-sm-4">Post-nom</dt>
+                        <dd class="col-sm-8">{{ client.personne.postnom }}</dd>
+                        <dt class="col-sm-4">Prénom</dt>
+                        <dd class="col-sm-8">{{ client.personne.prenom }}</dd>
+                        <dt class="col-sm-4">Sexe</dt>
+                        <dd class="col-sm-8">{{ client.personne.get_sexe_display }}</dd>
+                        <dt class="col-sm-4">Date de naissance</dt>
+                        <dd class="col-sm-8">{{ client.personne.date_naissance|date:'d/m/Y' }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

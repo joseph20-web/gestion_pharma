@@ -1,0 +1,67 @@
+{% extends 'base_modern.html' %}
+{% load static %}
+
+{% block title %}Interface Caisse - CAHMS{% endblock %}
+
+{% block brand_url %}{% url 'caisse_dashboard' %}{% endblock %}
+{% block brand_name %}Interface Caisse - CAHMS{% endblock %}
+{% block user_name %}Caissier{% endblock %}
+
+{% block navbar_items %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'caisse_dashboard' %}">
+        <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+    </a>
+</li>
+{% endblock %}
+
+{% block sidebar_items %}
+<li class="sidebar-nav-item">
+    <a href="{% url 'caisse_dashboard' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'caisse_dashboard' %}active{% endif %}">
+        <i class="sidebar-nav-icon fas fa-tachometer-alt"></i>
+                                Dashboard
+                            </a>
+                        </li>
+<li class="sidebar-nav-item">
+    <a href="{% url 'caisse_commande_list' %}" class="sidebar-nav-link {% if 'caisse_commande' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="sidebar-nav-icon fas fa-shopping-cart"></i>
+                                Commandes Clients
+                            </a>
+                        </li>
+<li class="sidebar-nav-item">
+    <a href="{% url 'caisse_agent_list' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'caisse_agent_list' %}active{% endif %}">
+        <i class="sidebar-nav-icon fas fa-users"></i>
+                                Agents & Fonctions
+                            </a>
+                        </li>
+<li class="sidebar-nav-item">
+    <a href="{% url 'caisse_produit_list' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'caisse_produit_list' %}active{% endif %}">
+        <i class="sidebar-nav-icon fas fa-pills"></i>
+                                Produits en Stock
+                            </a>
+                        </li>
+<li class="sidebar-nav-item">
+    <a href="{% url 'caisse_client_list' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'caisse_client_list' %}active{% endif %}">
+        <i class="sidebar-nav-icon fas fa-user-friends"></i>
+                                Clients
+                            </a>
+                        </li>
+<li class="sidebar-nav-item">
+    <a href="{% url 'caisse_fournisseur_list' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'caisse_fournisseur_list' %}active{% endif %}">
+        <i class="sidebar-nav-icon fas fa-truck"></i>
+                                Fournisseurs
+                            </a>
+                        </li>
+<li class="sidebar-nav-item">
+    <a href="{% url 'caisse_paiement_list' %}" class="sidebar-nav-link {% if 'caisse_paiement' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="sidebar-nav-icon fas fa-money-bill-wave"></i>
+                                Paiements
+                            </a>
+                        </li>
+                <li class="nav-item">
+                    <a href="{% url 'caisse_sortie_fond_list' %}" class="nav-link {% if request.resolver_match.url_name == 'caisse_sortie_fond_list' %}active{% endif %}">
+                        <i class="fas fa-arrow-circle-up"></i>
+                        Sorties de Fond
+                    </a>
+                </li>
+                {% endblock %}

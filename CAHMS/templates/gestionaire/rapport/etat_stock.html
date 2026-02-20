@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>État de Stock - CAHMS</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-50: #eff6ff;
+            --primary-100: #dbeafe;
+            --primary-200: #bfdbfe;
+            --primary-500: #3b82f6;
+            --primary-600: #2563eb;
+            --primary-700: #1d4ed8;
+            
+            --secondary-50: #f8fafc;
+            --secondary-100: #f1f5f9;
+            --secondary-200: #e2e8f0;
+            --secondary-700: #334155;
+            
+            --success-500: #22c55e;
+            --success-600: #16a34a;
+            --success-100: #dcfce7;
+            --success-200: #bbf7d0;
+            --success-700: #15803d;
+            
+            --warning-500: #eab308;
+            --warning-100: #fef3c7;
+            --warning-200: #fde68a;
+            --warning-700: #a16207;
+            
+            --danger-500: #ef4444;
+            --danger-100: #fee2e2;
+            --danger-200: #fecaca;
+            --danger-700: #b91c1c;
+            
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+        
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            
+            .print-header {
+                text-align: center;
+                margin-bottom: 30px;
+                border-bottom: 2px solid #333;
+                padding-bottom: 15px;
+            }
+            
+            .print-header h1 {
+                margin: 0;
+                font-size: 24px;
+                font-weight: bold;
+                color: #333;
+            }
+            
+            .print-header .hospital-info {
+                margin: 10px 0;
+                font-size: 16px;
+                color: #666;
+            }
+            
+            .print-header .report-info {
+                margin: 10px 0;
+                font-size: 14px;
+                color: #888;
+            }
+            
+            .print-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            
+            .print-table th,
+            .print-table td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+                font-size: 12px;
+            }
+            
+            .print-table th {
+                background-color: #f8f9fa;
+                font-weight: bold;
+            }
+            
+            .print-footer {
+                margin-top: 30px;
+                padding-top: 10px;
+                border-top: 1px solid #ddd;
+                text-align: center;
+                font-size: 10px;
+                color: #666;
+            }
+            
+            .stats-section { display: none !important; }
+            .filters-section { display: none !important; }
+            .btn-print-modern { display: none !important; }
+        }
+        
+        .print-only { display: none; }
+        
+        /* Header principal */
+        .main-header {
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .app-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .btn-print-modern {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-print-modern:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Container principal */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Améliorations du design moderne */
+        .page-header-modern {
+            background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--primary-200);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .page-title-modern {
+            color: var(--primary-700);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle-modern {
+            color: var(--gray-600);
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+        
+        .filters-card-modern {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .filters-header-modern {
+            background: linear-gradient(135deg, var(--secondary-50), var(--secondary-100));
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--secondary-200);
+        }
+        
+        .filters-header-modern h5 {
+            color: var(--secondary-700);
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .filters-body-modern {
+            padding: 2rem;
+        }
+        
+        .form-control-modern {
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .form-control-modern:focus {
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px var(--primary-100);
+            outline: none;
+        }
+        
+        .btn-filter-modern {
+            background: linear-gradient(135deg, var(--success-500), var(--success-600));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-filter-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            color: white;
+        }
+        
+        .btn-reset-modern {
+            background: linear-gradient(135deg, var(--gray-500), var(--gray-600));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-reset-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            color: white;
+        }
+        
+        .stats-grid-modern {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card-modern {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card-modern:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-card-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-500);
+        }
+        
+        .stat-card-modern.total::before { background: var(--primary-500); }
+        .stat-card-modern.rupture::before { background: var(--danger-500); }
+        .stat-card-modern.faible::before { background: var(--warning-500); }
+        .stat-card-modern.ok::before { background: var(--success-500); }
+        .stat-card-modern.warning::before { background: var(--warning-500); }
+        
+        .stat-icon-modern {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .stat-icon-modern.total { background: var(--primary-500); }
+        .stat-icon-modern.rupture { background: var(--danger-500); }
+        .stat-icon-modern.faible { background: var(--warning-500); }
+        .stat-icon-modern.ok { background: var(--success-500); }
+        .stat-icon-modern.warning { background: var(--warning-500); }
+        
+        .stat-number-modern {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label-modern {
+            color: var(--gray-600);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .table-container-modern {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+        
+        .table-header-modern {
+            background: linear-gradient(135deg, var(--gray-50), var(--gray-100));
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .table-header-modern h5 {
+            color: var(--gray-700);
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .table-modern {
+            margin: 0;
+        }
+        
+        .table-modern th {
+            background: var(--gray-50);
+            color: var(--gray-700);
+            font-weight: 600;
+            padding: 1rem;
+            border-bottom: 2px solid var(--gray-200);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .table-modern td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-100);
+            vertical-align: middle;
+        }
+        
+        .table-modern tbody tr:hover {
+            background: var(--gray-50);
+        }
+        
+        .badge-modern {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .badge-rupture {
+            background: var(--danger-100);
+            color: var(--danger-700);
+            border: 1px solid var(--danger-200);
+        }
+        
+        .badge-faible {
+            background: var(--warning-100);
+            color: var(--warning-700);
+            border: 1px solid var(--warning-200);
+        }
+        
+        .badge-ok {
+            background: var(--success-100);
+            color: var(--success-700);
+            border: 1px solid var(--success-200);
+        }
+        
+        .stock-value-modern {
+            font-weight: 600;
+            color: var(--primary-600);
+        }
+        
+        .empty-state-modern {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--gray-500);
+        }
+        
+        .empty-state-modern i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .empty-state-modern p {
+            font-size: 1.1rem;
+            margin: 0;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .stats-grid-modern {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- En-tête principal -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-hospital"></i>
+                </div>
+                <div>
+                    <h1 class="app-title">CENTRE D'ASSISTANCE MEDICO-HUMANITAIRE ESPOIR</h1>
+                    <p class="app-subtitle">Gestionnaire de Stock - CAHMS v2.0</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button onclick="window.print()" class="btn-print-modern">
+                    <i class="fas fa-print"></i>
+                    Imprimer le Rapport
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- En-tête d'impression -->
+    <div class="print-only">
+        <div class="print-header">
+            <h1>CENTRE D'ASSISTANCE MEDICO-HUMANITAIRE ESPOIR</h1>
+            <div class="hospital-info">
+                <strong>Rapport d'État de Stock</strong><br>
+                Service de Pharmacie
+            </div>
+            <div class="report-info">
+                <strong>Gestionnaire:</strong> {{ user.first_name }} {{ user.last_name }}<br>
+                <strong>Date d'impression:</strong> {% now "d/m/Y à H:i" %}<br>
+                {% if categorie or produit_recherche or seuil_critique %}
+                    <strong>Filtres appliqués:</strong>
+                    {% if categorie %}{{ categorie|title }}{% endif %}
+                    {% if produit_recherche %}{{ produit_recherche }}{% endif %}
+                    {% if seuil_critique %}Seuil ≤ {{ seuil_critique }}{% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Container principal -->
+    <div class="main-container">
+        <!-- En-tête de page -->
+        <div class="page-header-modern animate-slide-in no-print">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="page-title-modern">
+                        <i class="fas fa-boxes me-3"></i>État de Stock
+                    </h1>
+                    <p class="page-subtitle-modern">Consultez l'état actuel du stock de médicaments</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtres -->
+        <div class="filters-card-modern animate-fade-in filters-section no-print">
+            <div class="filters-header-modern">
+                <h5><i class="fas fa-filter me-2"></i>Filtres de Recherche</h5>
+            </div>
+            <div class="filters-body-modern">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="categorie" class="form-label fw-semibold">Catégorie</label>
+                        <select class="form-control-modern" id="categorie" name="categorie">
+                            <option value="">Toutes les catégories</option>
+                            <option value="comprime" {% if categorie == 'comprime' %}selected{% endif %}>Comprimé</option>
+                            <option value="gelule" {% if categorie == 'gelule' %}selected{% endif %}>Gélule</option>
+                            <option value="sirop" {% if categorie == 'sirop' %}selected{% endif %}>Sirop</option>
+                            <option value="injectable" {% if categorie == 'injectable' %}selected{% endif %}>Injectable</option>
+                            <option value="pommade" {% if categorie == 'pommade' %}selected{% endif %}>Pommade</option>
+                            <option value="creme" {% if categorie == 'creme' %}selected{% endif %}>Crème</option>
+                            <option value="suppositoire" {% if categorie == 'suppositoire' %}selected{% endif %}>Suppositoire</option>
+                            <option value="collyre" {% if categorie == 'collyre' %}selected{% endif %}>Collyre</option>
+                            <option value="suspension" {% if categorie == 'suspension' %}selected{% endif %}>Suspension</option>
+                            <option value="poudre" {% if categorie == 'poudre' %}selected{% endif %}>Poudre</option>
+                            <option value="autre" {% if categorie == 'autre' %}selected{% endif %}>Autre</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="produit" class="form-label fw-semibold">Rechercher un produit</label>
+                        <input type="text" class="form-control-modern" id="produit" name="produit" 
+                               value="{{ produit_recherche }}" placeholder="Nom ou code produit">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="seuil_critique" class="form-label fw-semibold">Seuil critique</label>
+                        <input type="number" class="form-control-modern" id="seuil_critique" name="seuil_critique" 
+                               value="{{ seuil_critique }}" placeholder="Quantité max">
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn-filter-modern me-2">
+                            <i class="fas fa-search me-2"></i>Filtrer
+                        </button>
+                        <a href="{% url 'rapport_etat_stock' %}" class="btn-reset-modern">
+                            <i class="fas fa-times me-2"></i>Réinitialiser
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="stats-grid-modern stats-section no-print">
+            <div class="stat-card-modern total animate-scale-in">
+                <div class="stat-icon-modern total">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <div class="stat-number-modern">{{ total_produits }}</div>
+                <div class="stat-label-modern">Total Produits en Stock</div>
+            </div>
+            
+            <div class="stat-card-modern rupture animate-scale-in">
+                <div class="stat-icon-modern rupture">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-number-modern">{{ produits_en_rupture }}</div>
+                <div class="stat-label-modern">En Rupture de Stock</div>
+            </div>
+            
+            <div class="stat-card-modern faible animate-scale-in">
+                <div class="stat-icon-modern faible">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="stat-number-modern">{{ produits_faible_stock }}</div>
+                <div class="stat-label-modern">Stock Faible (≤ 10)</div>
+            </div>
+            
+            <div class="stat-card-modern ok animate-scale-in">
+                <div class="stat-icon-modern ok">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-number-modern">{{ produits_stock_ok }}</div>
+                <div class="stat-label-modern">Stock Suffisant</div>
+            </div>
+            
+            <div class="stat-card-modern warning animate-scale-in">
+                <div class="stat-icon-modern warning">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-number-modern">{{ produits_expiration_proche }}</div>
+                <div class="stat-label-modern">Expirent dans 10 jours</div>
+            </div>
+        </div>
+
+        <!-- Liste des produits -->
+        <div class="table-container-modern animate-fade-in">
+            <div class="table-header-modern no-print">
+                <h5><i class="fas fa-list me-2"></i>Détail du Stock</h5>
+            </div>
+            
+            {% if produits %}
+                <div class="table-responsive">
+                    <table class="table table-modern print-table">
+                        <thead>
+                            <tr>
+                                <th>Code Produit</th>
+                                <th>Nom du Produit</th>
+                                <th>Forme</th>
+                                <th>Dosage</th>
+                                <th>Stock Actuel</th>
+                                <th>Prix Unitaire</th>
+                                <th>Date d'Expiration</th>
+                                <th class="no-print">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for produit in produits %}
+                            <tr>
+                                <td>
+                                    <span class="fw-bold text-primary">{{ produit.code_produit }}</span>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">{{ produit.nom_produit }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark">{{ produit.get_forme_display }}</span>
+                                </td>
+                                <td>
+                                    <span class="text-muted">{{ produit.dosage }} {{ produit.unite }}</span>
+                                </td>
+                                <td>
+                                    <span class="fw-bold fs-5 
+                                        {% if produit.quantite_stock == 0 %}text-danger
+                                        {% elif produit.quantite_stock <= 10 %}text-warning
+                                        {% else %}text-success{% endif %}">
+                                        {{ produit.quantite_stock }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold">{{ produit.prix_unitaire|floatformat:2 }} FC</span>
+                                </td>
+                                <td>
+                                    {% if produit.date_expiration %}
+                                        {% if produit.date_expiration <= date_limite and produit.date_expiration >= aujourd_hui %}
+                                            <span class="fw-bold text-danger">
+                                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                                {{ produit.date_expiration|date:"d/m/Y" }}
+                                            </span>
+                                        {% elif produit.date_expiration < aujourd_hui %}
+                                            <span class="fw-bold text-danger">
+                                                <i class="fas fa-times-circle me-1"></i>
+                                                {{ produit.date_expiration|date:"d/m/Y" }} (Expiré)
+                                            </span>
+                                        {% else %}
+                                            <span class="fw-semibold text-success">
+                                                {{ produit.date_expiration|date:"d/m/Y" }}
+                                            </span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">Non définie</span>
+                                    {% endif %}
+                                </td>
+                                <td class="no-print">
+                                    {% if produit.quantite_stock == 0 %}
+                                        <span class="badge-modern badge-rupture">Rupture</span>
+                                    {% elif produit.quantite_stock <= 10 %}
+                                        <span class="badge-modern badge-faible">Faible</span>
+                                    {% else %}
+                                        <span class="badge-modern badge-ok">OK</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pied de page d'impression -->
+                <div class="print-only">
+                    <div class="print-footer">
+                        <p>Rapport généré le {% now "d/m/Y à H:i" %} par {{ user.first_name }} {{ user.last_name }}</p>
+                        <p>Centre d'Assistance Medico-Humanitaire Espoir - Service de Pharmacie</p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="empty-state-modern">
+                    <i class="fas fa-inbox"></i>
+                    <p>Aucun produit trouvé avec les filtres appliqués.</p>
+                    <p class="text-muted">Essayez de modifier vos critères de recherche.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

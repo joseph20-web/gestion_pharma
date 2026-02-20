@@ -1,0 +1,205 @@
+{% extends 'caisse/base.html' %}
+
+{% block title %}Dashboard - Interface Caisse{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="mb-4 animate-fade-in">
+    <ol class="breadcrumb bg-light rounded shadow-sm px-4 py-3">
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="fas fa-tachometer-alt me-2"></i>Dashboard Caisse
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block page_header %}
+<div class="mb-4 animate-slide-in">
+    <h1 class="h3 mb-1 text-dark">
+        <i class="fas fa-cash-register me-2"></i>
+        Dashboard Interface Caisse
+    </h1>
+    <p class="text-muted">Bienvenue dans l'interface de gestion de la caisse</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-shopping-cart fa-2x text-primary"></i>
+                </div>
+                <h5 class="card-title text-dark">Commandes</h5>
+                <h2 class="text-primary mb-0">{{ total_commandes|default:0 }}</h2>
+                <small class="text-muted">Total</small>
+                {% if commandes_aujourd_hui > 0 %}
+                    <div class="mt-2">
+                        <span class="badge bg-success">{{ commandes_aujourd_hui }} aujourd'hui</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-money-bill-wave fa-2x text-success"></i>
+                </div>
+                <h5 class="card-title text-dark">Paiements</h5>
+                <h2 class="text-success mb-0">{{ total_paiements|default:0 }}</h2>
+                <small class="text-muted">Enregistrés</small>
+                {% if paiements_aujourd_hui > 0 %}
+                    <div class="mt-2">
+                        <span class="badge bg-success">{{ paiements_aujourd_hui }} aujourd'hui</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-user-friends fa-2x text-info"></i>
+                </div>
+                <h5 class="card-title text-dark">Clients</h5>
+                <h2 class="text-info mb-0">{{ total_clients|default:0 }}</h2>
+                <small class="text-muted">Enregistrés</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-pills fa-2x text-warning"></i>
+                </div>
+                <h5 class="card-title text-dark">Produits</h5>
+                <h2 class="text-warning mb-0">{{ total_produits|default:0 }}</h2>
+                <small class="text-muted">En stock</small>
+                {% if produits_faible_stock > 0 %}
+                    <div class="mt-2">
+                        <span class="badge bg-warning">{{ produits_faible_stock }} faible stock</span>
+                    </div>
+                {% endif %}
+                {% if produits_rupture > 0 %}
+                    <div class="mt-1">
+                        <span class="badge bg-danger">{{ produits_rupture }} rupture</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-6 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0 text-dark">
+                    <i class="fas fa-eye me-2"></i>Consultation
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <a href="{% url 'caisse_commande_list' %}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-shopping-cart me-2"></i>Voir les Commandes
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{% url 'caisse_agent_list' %}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-users me-2"></i>Agents & Fonctions
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{% url 'caisse_produit_list' %}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-pills me-2"></i>Produits en Stock
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{% url 'caisse_client_list' %}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-user-friends me-2"></i>Liste des Clients
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0 text-dark">
+                    <i class="fas fa-money-bill-wave me-2"></i>Gestion des Paiements
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <a href="{% url 'caisse_paiement_list' %}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-list me-2"></i>Voir les Paiements
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{% url 'caisse_paiement_create' %}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-plus me-2"></i>Nouveau Paiement
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{% url 'caisse_fournisseur_list' %}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-truck me-2"></i>Fournisseurs
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{% url 'caisse_verification_facture' %}" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-search me-2"></i>Vérification de facture
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0 text-dark">
+                    <i class="fas fa-info-circle me-2"></i>Informations Importantes
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-primary mb-3">
+                            <i class="fas fa-eye me-2"></i>Fonctionnalités de Consultation
+                        </h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Consulter les commandes clients</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Voir la liste des agents et leurs fonctions</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Consulter les produits en stock</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Voir la liste des clients</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Consulter les fournisseurs</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-success mb-3">
+                            <i class="fas fa-edit me-2"></i>Gestion des Paiements
+                        </h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-plus text-primary me-2"></i>Créer de nouveaux paiements</li>
+                            <li class="mb-2"><i class="fas fa-edit text-warning me-2"></i>Modifier les paiements existants</li>
+                            <li class="mb-2"><i class="fas fa-trash text-danger me-2"></i>Supprimer des paiements</li>
+                            <li class="mb-2"><i class="fas fa-eye text-info me-2"></i>Consulter les détails des paiements</li>
+                            <li class="mb-2"><i class="fas fa-list text-secondary me-2"></i>Voir la liste complète des paiements</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

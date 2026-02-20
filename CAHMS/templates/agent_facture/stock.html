@@ -1,0 +1,275 @@
+{% extends 'agent_facture/base.html' %}
+
+{% block title %}Stock - Agent Facturation{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- En-tête -->
+    <div class="col-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="fas fa-boxes me-2"></i>
+                    Gestion du Stock
+                </h2>
+                <p class="text-muted mb-0">Surveillez l'état de vos produits en temps réel</p>
+            </div>
+            <div>
+                <a href="{% url 'agent_facture_commande_create' %}" class="btn btn-primary">
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    Nouvelle Commande
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques du stock -->
+    <div class="col-12 mb-4">
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <div class="stats-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-1">{{ total_produits }}</h3>
+                            <p class="mb-0 opacity-75">Total Produits</p>
+                        </div>
+                        <div class="text-end">
+                            <i class="fas fa-pills fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="stats-card success">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-1">{{ stock_ok }}</h3>
+                            <p class="mb-0 opacity-75">Stock OK</p>
+                        </div>
+                        <div class="text-end">
+                            <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="stats-card warning">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-1">{{ stock_faible }}</h3>
+                            <p class="mb-0 opacity-75">Stock Faible</p>
+                        </div>
+                        <div class="text-end">
+                            <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="stats-card danger">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-1">{{ valeur_stock|floatformat:0 }}</h3>
+                            <p class="mb-0 opacity-75">Valeur Stock (FC)</p>
+                        </div>
+                        <div class="text-end">
+                            <i class="fas fa-money-bill-wave fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertes de stock -->
+    {% if stock_faible > 0 %}
+    <div class="col-12 mb-4">
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Attention !</strong> {{ stock_faible }} produit(s) ont un stock faible. 
+            Veuillez contacter le gestionnaire pour un approvisionnement.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Filtres -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Rechercher un produit</label>
+                        <input type="text" name="search" class="form-control" placeholder="Nom du produit..." value="{{ request.GET.search }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Statut du stock</label>
+                        <select name="statut" class="form-select">
+                            <option value="">Tous</option>
+                            <option value="faible" {% if request.GET.statut == 'faible' %}selected{% endif %}>Stock faible</option>
+                            <option value="ok" {% if request.GET.statut == 'ok' %}selected{% endif %}>Stock OK</option>
+                            <option value="critique" {% if request.GET.statut == 'critique' %}selected{% endif %}>Stock critique</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Trier par</label>
+                        <select name="tri" class="form-select">
+                            <option value="nom" {% if request.GET.tri == 'nom' %}selected{% endif %}>Nom</option>
+                            <option value="stock" {% if request.GET.tri == 'stock' %}selected{% endif %}>Stock</option>
+                            <option value="prix" {% if request.GET.tri == 'prix' %}selected{% endif %}>Prix</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i>Filtrer
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des produits -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    Inventaire des Produits
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if produits %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Produit</th>
+                                    <th>Code</th>
+                                    <th>Stock</th>
+                                    <th>Prix Unitaire</th>
+                                    <th>Valeur Stock</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for produit in produits %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>{{ produit.nom_produit }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ produit.forme }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ produit.code_produit }}</span>
+                                    </td>
+                                    <td>
+                                        {% if produit.quantite_stock <= 5 %}
+                                            <span class="badge bg-danger fs-6">{{ produit.quantite_stock }}</span>
+                                        {% elif produit.quantite_stock <= 10 %}
+                                            <span class="badge bg-warning fs-6">{{ produit.quantite_stock }}</span>
+                                        {% else %}
+                                            <span class="badge bg-success fs-6">{{ produit.quantite_stock }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <strong>{{ produit.prix_unitaire|floatformat:0 }} FC</strong>
+                                    </td>
+                                    <td>
+                                        <strong>{{ produit.prix_unitaire|floatformat:0 }} FC</strong>
+                                    </td>
+                                    <td>
+                                        {% if produit.quantite_stock <= 5 %}
+                                            <span class="badge bg-danger">Critique</span>
+                                        {% elif produit.quantite_stock <= 10 %}
+                                            <span class="badge bg-warning">Faible</span>
+                                        {% else %}
+                                            <span class="badge bg-success">OK</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-info" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#produitModal{{ produit.id }}"
+                                                    title="Voir détails">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <a href="{% url 'agent_facture_commande_create' %}" 
+                                               class="btn btn-sm btn-outline-primary" 
+                                               title="Commander">
+                                                <i class="fas fa-shopping-cart"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Modal pour les détails du produit -->
+                                <div class="modal fade" id="produitModal{{ produit.id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">
+                                                    <i class="fas fa-pills me-2"></i>
+                                                    {{ produit.nom_produit }}
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <p><strong>Code:</strong> {{ produit.code_produit }}</p>
+                                                        <p><strong>Forme:</strong> {{ produit.forme }}</p>
+                                                        <p><strong>Unité:</strong> {{ produit.unite }}</p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p><strong>Stock:</strong> {{ produit.quantite_stock }}</p>
+                                                        <p><strong>Prix:</strong> {{ produit.prix_unitaire|floatformat:0 }} FC</p>
+                                                        <p><strong>Valeur:</strong> {{ produit.prix_unitaire|floatformat:0 }} FC</p>
+                                                    </div>
+                                                </div>
+                                                
+                                                {% if produit.quantite_stock <= 10 %}
+                                                <div class="alert alert-warning mt-3">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    <strong>Attention !</strong> Le stock de ce produit est faible.
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                                <a href="{% url 'agent_facture_commande_create' %}" class="btn btn-primary">
+                                                    <i class="fas fa-shopping-cart me-2"></i>Commander
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-boxes fa-4x text-muted mb-4"></i>
+                        <h4 class="text-muted mb-3">Aucun produit trouvé</h4>
+                        <p class="text-muted mb-4">Aucun produit ne correspond à vos critères de recherche</p>
+                        <a href="{% url 'agent_facture_stock' %}" class="btn btn-primary">
+                            <i class="fas fa-refresh me-2"></i>Voir tous les produits
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
